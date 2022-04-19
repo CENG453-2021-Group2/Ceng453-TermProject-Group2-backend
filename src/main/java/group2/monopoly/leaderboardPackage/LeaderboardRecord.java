@@ -1,4 +1,4 @@
-package com.example.demo.leaderboardPackage;
+package group2.monopoly.leaderboardPackage;
 
 import javax.persistence.*;
 

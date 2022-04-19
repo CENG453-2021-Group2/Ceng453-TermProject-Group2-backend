@@ -1,16 +1,15 @@
 package group2.monopoly.controller;
 
-import group2.monopoly.entity.Role;
-import group2.monopoly.entity.User;
+
 import group2.monopoly.payload.GenericResponse;
 import group2.monopoly.payload.LoginDto;
 import group2.monopoly.payload.SignUpDto;
-import group2.monopoly.repository.RoleRepository;
-import group2.monopoly.repository.UserRepository;
+import group2.monopoly.player.Player;
+import group2.monopoly.player.PlayerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.PlayernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,50 +27,46 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
 
-    private final UserRepository userRepository;
+    private final PlayerRepository playerRepository;
 
-    private final RoleRepository roleRepository;
+
 
     private final PasswordEncoder passwordEncoder;
 
     public AuthController(AuthenticationManager authenticationManager,
-                          UserRepository userRepository, RoleRepository roleRepository,
+                          PlayerRepository playerRepository,
                           PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+        this.playerRepository = playerRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<GenericResponse> authenticateUser(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<GenericResponse> authenticatePlayer(@RequestBody LoginDto loginDto) {
         Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                authenticationManager.authenticate(new PlayernamePasswordAuthenticationToken(
                         loginDto.getUsername(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return new ResponseEntity<>(GenericResponse.message("success"), HttpStatus.OK);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<GenericResponse> registerUser(@Valid @RequestBody SignUpDto signUpDto) {
+    public ResponseEntity<GenericResponse> registerPlayer(@Valid @RequestBody SignUpDto signUpDto) {
         System.out.println("hello");
         System.out.println(signUpDto);
-        if (userRepository.existsByUsername(signUpDto.getUsername())) {
-            return new ResponseEntity<>(GenericResponse.error("username exists"), HttpStatus.BAD_REQUEST);
+        if (playerRepository.existsByUsername(signUpDto.getUsername())) {
+            return new ResponseEntity<>(GenericResponse.error("playername exists"), HttpStatus.BAD_REQUEST);
         }
-        if (userRepository.existsByEmail(signUpDto.getEmail())) {
+        if (playerRepository.existsByEmail(signUpDto.getEmail())) {
             return new ResponseEntity<>(GenericResponse.error("email exists"), HttpStatus.BAD_REQUEST);
         }
 
-        User user = new User();
-        user.setUsername(signUpDto.getUsername());
-        user.setEmail(signUpDto.getEmail());
-        user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
+        Player player = new Player();
+        player.setUsername(signUpDto.getUsername());
+        player.setEmail(signUpDto.getEmail());
+        player.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
 
-        Role roles = roleRepository.findByName("ROLE_USER").get();
-        user.setRoles(Collections.singleton(roles));
-
-        userRepository.save(user);
+        playerRepository.save(player);
 
         return new ResponseEntity<>(GenericResponse.message("success"), HttpStatus.OK);
     }

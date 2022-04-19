@@ -1,4 +1,4 @@
-package com.example.demo.leaderboardPackage;
+package group2.monopoly.leaderboardPackage;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

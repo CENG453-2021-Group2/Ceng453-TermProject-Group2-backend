@@ -1,4 +1,4 @@
-package com.example.demo.leaderboardPackage;
+package group2.monopoly.leaderboardPackage;
 
 import com.example.demo.player.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
