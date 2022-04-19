@@ -9,6 +9,6 @@ import java.util.Optional;
 @Repository
 public interface PlayerRepository extends JpaRepository<Player, Long> {
 
-    @Query(value = "SELECT * FROM player WHERE email = ?1", nativeQuery = true)
+    //@Query(value = "SELECT * FROM player WHERE email = ?1", nativeQuery = true)
     Optional<Player> findPlayerByEmail(String name);
 }

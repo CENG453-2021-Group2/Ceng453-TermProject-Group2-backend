@@ -21,7 +21,6 @@ public class PlayerService {
 
     }
 
-
     public void add(Player player) {
         Optional<Player> playerbyEmail = playerRepository.findPlayerByEmail(player.getEmail());
 
@@ -39,6 +38,26 @@ public class PlayerService {
         }
         else {
             throw new IllegalStateException("Player with id " + id + " does not exist");
+        }
+    }
+
+    public Player getPlayer(Long id) {
+        Optional<Player> player = playerRepository.findById(id);
+        if (player.isPresent()) {
+            return player.get();
+        }
+        else {
+            throw new IllegalStateException("Player with id " + id + " does not exist");
+        }
+    }
+
+    public Long getPlayerId(String email) {
+        Optional<Player> player = playerRepository.findPlayerByEmail(email);
+        if (player.isPresent()) {
+            return player.get().getId();
+        }
+        else {
+            throw new IllegalStateException("Player with email " + email + " does not exist");
         }
     }
 

@@ -2,6 +2,7 @@ package com.example.demo.leaderboardPackage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.example.demo.player.PlayerService;
 
 import java.util.List;
 
@@ -10,10 +11,12 @@ import java.util.List;
 public class LeaderboardRecordController {
 
     private final LeaderboardRecordService leaderboardRecordService;
+    private final PlayerService playerService;
 
     @Autowired
-    public LeaderboardRecordController(LeaderboardRecordService LeaderboardRecordService) {
+    public LeaderboardRecordController(LeaderboardRecordService LeaderboardRecordService, PlayerService playerService) {
         this.leaderboardRecordService = LeaderboardRecordService;
+        this.playerService = playerService;
     }
 
     @RequestMapping("/get")
@@ -21,9 +24,13 @@ public class LeaderboardRecordController {
         return leaderboardRecordService.getLeaderboardRecords();
     }
 
-    @PostMapping("/register")
-    public void registerLeaderboardRecord(@RequestBody LeaderboardRecord LeaderboardRecord) {
-        leaderboardRecordService.add(LeaderboardRecord);
+    @PostMapping("/save")
+    public void registerLeaderboardRecord(@RequestBody LeaderboardRecord leaderboardRecord) {
+        Long playerId = leaderboardRecord.getId();
+        if (playerService.getPlayer(playerId) == null) {
+            throw new RuntimeException("Player with id " + playerId + " does not exist");
+        }
+        leaderboardRecordService.add(leaderboardRecord);
     }
 
     @DeleteMapping("/delete/{id}")
