@@ -11,4 +11,6 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     //@Query(value = "SELECT * FROM player WHERE email = ?1", nativeQuery = true)
     Optional<Player> findPlayerByEmail(String name);
+    Optional<Player> findPlayerbyId(Long id);
+    Optional<Player> updatePlayer(Player player);
 }

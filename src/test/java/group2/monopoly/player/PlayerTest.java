@@ -1,5 +1,6 @@
-package com.example.demo.leaderboardPackage;
+package group2.monopoly.player;
 
+import com.example.demo.player.Player;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -7,10 +8,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-class LeaderboardRecordTest{
-
-}
-/*
 class PlayerTest {
 
     @org.junit.jupiter.api.Test
@@ -182,5 +179,3 @@ class PlayerTest {
         assertEquals("Player{id=1, username='username', password='password', email='email'}", player.toString());
     }
 }
-
-*/

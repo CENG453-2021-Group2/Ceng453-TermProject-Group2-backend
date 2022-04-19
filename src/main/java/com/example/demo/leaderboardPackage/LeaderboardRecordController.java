@@ -1,5 +1,6 @@
 package com.example.demo.leaderboardPackage;
 
+import com.example.demo.player.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.player.PlayerService;
@@ -10,32 +11,32 @@ import java.util.List;
 @RequestMapping("/LeaderboardRecord")
 public class LeaderboardRecordController {
 
-    private final LeaderboardRecordService leaderboardRecordService;
-    private final PlayerService playerService;
+    private final LeaderboardRecordRepository leaderboardRecordRepository;
+    private final PlayerRepository playerRepository;
 
     @Autowired
-    public LeaderboardRecordController(LeaderboardRecordService LeaderboardRecordService, PlayerService playerService) {
-        this.leaderboardRecordService = LeaderboardRecordService;
-        this.playerService = playerService;
+    public LeaderboardRecordController(LeaderboardRecordRepository leaderboardRecordRepository, PlayerRepository playerRepository) {
+        this.leaderboardRecordRepository = leaderboardRecordRepository;
+        this.playerRepository = playerRepository;
     }
 
     @RequestMapping("/get")
     public List<LeaderboardRecord> getLeaderboardRecord() {
-        return leaderboardRecordService.getLeaderboardRecords();
+        return leaderboardRecordRepository.findAll();
     }
 
     @PostMapping("/save")
     public void registerLeaderboardRecord(@RequestBody LeaderboardRecord leaderboardRecord) {
         Long playerId = leaderboardRecord.getId();
-        if (playerService.getPlayer(playerId) == null) {
+        if (playerRepository.findPlayerbyId(playerId).isEmpty()) {
             throw new RuntimeException("Player with id " + playerId + " does not exist");
         }
-        leaderboardRecordService.add(leaderboardRecord);
+        leaderboardRecordRepository.save(leaderboardRecord);
     }
 
     @DeleteMapping("/delete/{id}")
     public void deleteLeaderboardRecord(@PathVariable("id") Long id) {
-        leaderboardRecordService.delete(id);
+        leaderboardRecordRepository.removeById(id);
     }
 
 
