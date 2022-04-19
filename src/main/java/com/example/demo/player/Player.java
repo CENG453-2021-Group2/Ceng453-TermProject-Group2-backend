@@ -25,7 +25,7 @@ public class Player {
     }
 
     public Player(Long id, String username, String password, String email) {
-        this.id = id;
+        setId(id); // using this function to validate id
         this.username = username;
         this.password = password;
         this.email = email;
@@ -42,6 +42,12 @@ public class Player {
     }
 
     public void setId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id cannot be null");
+        }
+        if (id < 1) {
+            throw new IllegalArgumentException("Id cannot be less than 1");
+        }
         this.id = id;
     }
 
@@ -50,6 +56,9 @@ public class Player {
     }
 
     public void setUsername(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
         this.username = username;
     }
 
@@ -58,6 +67,9 @@ public class Player {
     }
 
     public void setPassword(String password) {
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
         this.password = password;
     }
 
@@ -66,6 +78,9 @@ public class Player {
     }
 
     public void setEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be null or empty");
+        }
         this.email = email;
     }
 
