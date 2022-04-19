@@ -1,4 +1,4 @@
-package com.example.demo.player;
+package group2.monopoly.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,16 +9,18 @@ import java.util.List;
 @RequestMapping("/player")
 public class PlayerController {
 
+    private final PlayerRepository playerRepository;
     private final PlayerService playerService;
 
     @Autowired
-    public PlayerController(PlayerService playerService) {
+    public PlayerController(PlayerRepository playerRepository, PlayerService playerService) {
+        this.playerRepository = playerRepository;
         this.playerService = playerService;
     }
 
     @RequestMapping("/get")
-    public List<Player> getPlayer() {
-        return playerService.getPlayers();
+    public List<Player> getPlayers() {
+        return playerRepository.findAll();
     }
 
     @PostMapping("/register")
@@ -26,10 +28,9 @@ public class PlayerController {
         playerService.add(player);
     }
 
+    // Not all players should delete other players TODO: fix this
     @DeleteMapping("/delete/{id}")
     public void deletePlayer(@PathVariable("id") Long id) {
-        playerService.delete(id);
+        playerRepository.removeById(id);
     }
-
-
 }

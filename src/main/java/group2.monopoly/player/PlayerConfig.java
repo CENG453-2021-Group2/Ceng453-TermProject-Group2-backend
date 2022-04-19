@@ -1,4 +1,4 @@
-package com.example.demo.player;
+package group2.monopoly.player;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class PlayerConfig {
 
+    /* Will be added after the merge is complete TODO
     @Bean
     CommandLineRunner commandLineRunner(PlayerRepository playerRepository) {
         return args -> {
@@ -32,4 +33,6 @@ public class PlayerConfig {
             playerRepository.saveAll(java.util.Arrays.asList(kobe, lebron, asdf));
         };
     }
+    */
+
 }
