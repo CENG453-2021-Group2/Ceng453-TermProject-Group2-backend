@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
+// TODO: move this to PlayerRepositoryTest
 public class UserRepositoryIntegrationTest {
 
     @Autowired
