@@ -52,10 +52,8 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<GenericResponse> registerPlayer(@Valid @RequestBody SignUpDto signUpDto) {
-        System.out.println("hello");
-        System.out.println(signUpDto);
         if (playerRepository.existsByUsername(signUpDto.getUsername())) {
-            return new ResponseEntity<>(GenericResponse.error("playername exists"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(GenericResponse.error("username exists"), HttpStatus.BAD_REQUEST);
         }
         if (playerRepository.existsByEmail(signUpDto.getEmail())) {
             return new ResponseEntity<>(GenericResponse.error("email exists"), HttpStatus.BAD_REQUEST);

@@ -15,11 +15,9 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
                 new CharacterRule(EnglishCharacterData.Alphabetical, 1),
                 new CharacterRule(EnglishCharacterData.Digit, 1));
         RuleResult result = validator.validate(new PasswordData(s));
-        System.out.println("HI");
         if (result.isValid()) {
             return true;
         }
-        System.out.println("NOT VALID");
         List<String> messages = validator.getMessages(result);
         String messageString = String.join(",", messages);
         constraintValidatorContext.disableDefaultConstraintViolation();
