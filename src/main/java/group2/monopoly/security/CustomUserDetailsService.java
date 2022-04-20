@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.management.relation.Role;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,15 +27,20 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Player user =
+        Player player =
                 playerRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Player not found with username: " + username));
-        return new org.springframework.security.core.userdetails.User(user.getEmail(),
-                user.getPassword(), mapRolesToAuthorities(user.getRoles()));
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(player.getUsername())
+                .roles("USER") // TODO: Should not be hardcoded.
+                .password(player.getPassword())
+                .build();
     }
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
-        // TODO!!!!!
-        //return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+        /* TODO(DK): /api/auth/register should grant user role. We should implement a CLI option to
+         * create super users like is the case in Django (python manage.py createsuperuser).
+         */
+//        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
         return null;
     }
 }
