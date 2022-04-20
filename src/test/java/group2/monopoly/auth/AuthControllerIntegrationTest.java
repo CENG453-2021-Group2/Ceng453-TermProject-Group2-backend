@@ -1,7 +1,6 @@
 package group2.monopoly.auth;
 
 import group2.monopoly.MonopolyApplication;
-import group2.monopoly.player.PlayerRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +11,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.transaction.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
@@ -213,9 +212,9 @@ public class AuthControllerIntegrationTest {
         ).andExpect(jsonPath("$.success").value(true)
         ).andExpect(jsonPath("$.message").value("logged in"));
     }
+
     @Transactional
     @Test
-
     public void BadCredentials_whenLogin_thenStatus401() throws Exception {
         mvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
