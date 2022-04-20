@@ -1,9 +1,11 @@
 package group2.monopoly.leaderboard;
 
+import group2.monopoly.leaderboard7.LeaderboardRecord7;
+
 import javax.persistence.*;
 
 @Entity
-@Table
+@Table(name = "leaderboard")
 public class LeaderboardRecord {
     @Id
     @SequenceGenerator(
@@ -15,9 +17,13 @@ public class LeaderboardRecord {
             strategy = GenerationType.SEQUENCE,
             generator = "leaderboard_record_seq"
     )
-
+    @Column(name = "id")
     private Long id;
     private Long score;
+
+    @OneToOne
+    @JoinColumn(name = "id")
+    private LeaderboardRecord7 leaderboardRecord7;
 
     public LeaderboardRecord() {
     }
