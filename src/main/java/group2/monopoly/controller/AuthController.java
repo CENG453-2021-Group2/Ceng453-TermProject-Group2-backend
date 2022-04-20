@@ -45,7 +45,7 @@ public class AuthController {
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                         loginDto.getUsername(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>(GenericResponse.message("success"), HttpStatus.OK);
+        return new ResponseEntity<>(GenericResponse.message("logged in"), HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -64,7 +64,7 @@ public class AuthController {
 
         playerRepository.save(player);
 
-        return new ResponseEntity<>(GenericResponse.message("success"), HttpStatus.OK);
+        return new ResponseEntity<>(GenericResponse.message("signed up"), HttpStatus.OK);
     }
 
 }
