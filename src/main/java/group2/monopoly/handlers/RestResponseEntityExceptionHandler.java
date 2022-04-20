@@ -19,9 +19,34 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * It extends the ResponseEntityExceptionHandler class and overrides the handleMethodArgumentNotValid
+ * method to return a JSON response with the validation errors
+ */
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
+    /**
+     * A custom exception handler for the MethodArgumentNotValidException.
+     * 
+     * @param ex The exception that was thrown
+     * @param headers The headers to be written to the response
+     * @param status The HTTP status code to return.
+     * @param request The current request.
+     * @return A JSON object with the following structure:
+     * ```
+     * {
+     *     "success": false,
+     *     "message": "One or more fields could not be validated.",
+     *     "details": {
+     *         "field1": [
+     *             "error1",
+     *             "error2"
+     *         ],
+     *         "field2": [
+     *             "error1",
+     *             "error
+     */
     @Override
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseEntity handleMethodArgumentNotValid(MethodArgumentNotValidException ex,

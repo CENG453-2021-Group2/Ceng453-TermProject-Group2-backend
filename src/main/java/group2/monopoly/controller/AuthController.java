@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.Collections;
 
+/**
+ * It contains two endpoints, one for login and one for registration
+ */
 @RestController
 @RequestMapping(value = "/api/auth", produces = "application/json", consumes = "application/json")
 public class AuthController {
@@ -39,6 +42,14 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * It takes a username and password, checks if they are valid, and if they are, it sets the current
+     * user to the user with that username
+     * 
+     * @param loginDto This is the object that will be sent to the server. It contains the username and
+     * password.
+     * @return A generic response with a message of "success"
+     */
     @PostMapping("/login")
     public ResponseEntity<GenericResponse> authenticatePlayer(@RequestBody LoginDto loginDto) {
         Authentication authentication =
@@ -48,6 +59,13 @@ public class AuthController {
         return new ResponseEntity<>(GenericResponse.message("success"), HttpStatus.OK);
     }
 
+    /**
+     * If the username or email already exists, return an error message, otherwise create a new player
+     * and save it to the database
+     * 
+     * @param signUpDto This is the object that will be sent to the server.
+     * @return A response entity with a generic response object.
+     */
     @PostMapping("/register")
     public ResponseEntity<GenericResponse> registerPlayer(@Valid @RequestBody SignUpDto signUpDto) {
         if (playerRepository.existsByUsername(signUpDto.getUsername())) {

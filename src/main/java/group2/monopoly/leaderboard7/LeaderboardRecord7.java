@@ -5,6 +5,9 @@ import group2.monopoly.player.Player;
 
 import javax.persistence.*;
 
+/**
+ * It's a Java class that represents a row in the leaderboard7 table
+ */
 @Entity
 @Table(name = "leaderboard7")
 public class LeaderboardRecord7 {

@@ -16,15 +16,27 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
+/**
+ * It implements the UserDetailsService interface and overrides the loadUserByUsername method
+ */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final PlayerRepository playerRepository;
 
+    // A constructor.
     public CustomUserDetailsService(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
     }
 
+    /**
+     * If the user exists, return a UserDetails object with the username, password, and role of the
+     * user. Otherwise, throw an exception.
+     * 
+     * @param username The username of the user to load.
+     * @return A UserDetails object.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Player player =

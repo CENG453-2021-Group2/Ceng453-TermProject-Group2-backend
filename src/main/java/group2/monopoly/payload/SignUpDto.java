@@ -6,6 +6,9 @@ import lombok.Data;
 
 import javax.validation.constraints.Email;
 
+/**
+ * It's a DTO that contains a username, email, and password
+ */
 @Data
 public class SignUpDto {
     @ValidUsername

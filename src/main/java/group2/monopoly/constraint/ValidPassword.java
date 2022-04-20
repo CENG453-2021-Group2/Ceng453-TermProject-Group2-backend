@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.*;
 
+// A custom annotation that is used to validate the password.
 @Documented
 @Constraint(validatedBy = PasswordConstraintValidator.class)
 @Retention(RetentionPolicy.RUNTIME)

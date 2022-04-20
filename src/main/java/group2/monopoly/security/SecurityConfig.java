@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * It configures the security for the application
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -22,11 +25,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * The password encoder is a function that takes a password and returns a hash of that password
+     * 
+     * @return A new instance of BCryptPasswordEncoder.
+     */
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * If the request is to the /api/auth/** endpoint, allow it. Otherwise, require authentication.
+     * 
+     * @param http This is the object that allows configuring web based security for specific http
+     * requests.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -39,11 +53,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic();
     }
 
+    /**
+     * "Configure the AuthenticationManagerBuilder with a UserDetailsService and a PasswordEncoder."
+     * 
+     * The AuthenticationManagerBuilder is a helper class that allows easy creation of an
+     * AuthenticationManager
+     * 
+     * @param auth AuthenticationManagerBuilder is used to create an AuthenticationManager instance
+     * which is the main Spring Security interface for authenticating a user.
+     */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
+    /**
+     * The `authenticationManagerBean()` function is used to expose the `AuthenticationManager` as a
+     * Bean
+     * 
+     * @return AuthenticationManager
+     */
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {

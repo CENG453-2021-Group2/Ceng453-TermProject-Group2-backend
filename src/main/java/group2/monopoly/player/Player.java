@@ -7,6 +7,10 @@ import javax.management.relation.Role;
 import javax.persistence.*;
 import java.util.Set;
 
+
+/**
+ * It's a Java class that represents a row in the player table in the database
+ */
 @Getter
 @Setter
 @ToString

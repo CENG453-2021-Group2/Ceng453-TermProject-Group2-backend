@@ -4,6 +4,9 @@ import group2.monopoly.leaderboard7.LeaderboardRecord7;
 
 import javax.persistence.*;
 
+/**
+ * It's a simple class that represents a record in a leaderboard
+ */
 @Entity
 @Table(name = "leaderboard")
 public class LeaderboardRecord {
