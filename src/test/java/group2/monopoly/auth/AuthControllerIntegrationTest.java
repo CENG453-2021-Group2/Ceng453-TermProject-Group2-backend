@@ -11,9 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
@@ -118,7 +119,8 @@ public class AuthControllerIntegrationTest {
                             "email": "example@example.com"
                         }
                         """)
-        ).andExpect(status().isBadRequest());
+        ).andExpect(status().isBadRequest()
+        ).andExpect(jsonPath("$.details.username[0]").isNotEmpty());
     }
 
     @Test
@@ -127,7 +129,43 @@ public class AuthControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
-                            "username": "unnecessarilylongpasswordthatislikelytoberejected",
+                            "username": "example",
+                            "password": "nicepassword123",
+                            "email": "example@example.com"
+                        }
+                        """)
+        ).andExpect(status().isOk());
+
+        mvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "username": "example",
+                            "password": "nicepassword123",
+                            "email": "example2@example.com"
+                        }
+                        """)
+        ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void givenDuplicateEmail_whenRegister_thenStatus400() throws Exception {
+        mvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "username": "example",
+                            "password": "nicepassword123",
+                            "email": "example@example.com"
+                        }
+                        """)
+        ).andExpect(status().isOk());
+
+        mvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "username": "example2",
                             "password": "nicepassword123",
                             "email": "example@example.com"
                         }
