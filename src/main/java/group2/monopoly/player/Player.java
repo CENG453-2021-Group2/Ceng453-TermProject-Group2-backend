@@ -2,7 +2,11 @@ package group2.monopoly.player;
 
 import lombok.*;
 
+
+import javax.management.relation.Role;
 import javax.persistence.*;
+import java.util.Set;
+
 @Getter
 @Setter
 @ToString
@@ -39,6 +43,11 @@ public class Player {
         this.username = username;
         this.password = password;
         this.email = email;
+    }
+
+    // Putting this just to make security work for now
+    public Set<Role> getRoles() {
+        return null;
     }
 
     /*

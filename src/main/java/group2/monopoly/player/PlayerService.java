@@ -21,7 +21,7 @@ public class PlayerService {
         if (playerbyEmail.isPresent()) {
             throw new IllegalStateException("Player with email " + player.getEmail() + " already exists");
         }
-
+        System.out.println("Adding player: " + player.getEmail());
         playerRepository.save(player);
     }
 

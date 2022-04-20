@@ -1,6 +1,6 @@
 package group2.monopoly.player;
 
-import com.example.demo.player.Player;
+import group2.monopoly.player.Player;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -14,7 +14,6 @@ class PlayerTest {
     void getId() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             Player player = new Player(
-                    null,
                     "username",
                     "password",
                     "email"
@@ -22,58 +21,19 @@ class PlayerTest {
         });
 
         AtomicReference<Player> player = new AtomicReference<>(new Player(
-                1L,
                 "username",
                 "password",
                 "email"
         ));
         assertEquals(1L, player.get().getId());
 
-        player.set(new Player(
-                34567834657843L,
-                "username",
-                "password",
-                "email"
-        ));
-        assertEquals(34567834657843L, player.get().getId());
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            player.set(new Player(
-                    -12321321L,
-                    "username",
-                    "password",
-                    "email"
-            ));
-        });
 
     }
 
-    @org.junit.jupiter.api.Test
-    void setId() {
-        Player player = new Player(
-                1L,
-                "username",
-                "password",
-                "email"
-        );
-
-        player.setId(34567834657843L);
-        assertEquals(34567834657843L, player.getId());
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            player.setId(-12321321L);
-        });
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            player.setId(null);
-        });
-
-    }
 
     @org.junit.jupiter.api.Test
     void getUsername() {
         Player player = new Player(
-                1L,
                 "username",
                 "password",
                 "email"
@@ -84,7 +44,6 @@ class PlayerTest {
     @org.junit.jupiter.api.Test
     void setUsername() {
         Player player = new Player(
-                1L,
                 "username",
                 "password",
                 "email"
@@ -105,7 +64,6 @@ class PlayerTest {
     @org.junit.jupiter.api.Test
     void getPassword() {
         Player player = new Player(
-                1L,
                 "username",
                 "password",
                 "email"
@@ -117,7 +75,6 @@ class PlayerTest {
     @org.junit.jupiter.api.Test
     void setPassword() {
         Player player = new Player(
-                1L,
                 "username",
                 "password",
                 "email"
@@ -138,7 +95,6 @@ class PlayerTest {
     @org.junit.jupiter.api.Test
     void getEmail() {
         Player player = new Player(
-                1L,
                 "username",
                 "password",
                 "email"
@@ -150,7 +106,6 @@ class PlayerTest {
     @org.junit.jupiter.api.Test
     void setEmail() {
         Player player = new Player(
-                1L,
                 "username",
                 "password",
                 "email"
@@ -171,7 +126,6 @@ class PlayerTest {
     @org.junit.jupiter.api.Test
     void testToString() {
         Player player = new Player(
-                1L,
                 "username",
                 "password",
                 "email"
