@@ -29,8 +29,6 @@ public class AuthController {
 
     private final PlayerRepository playerRepository;
 
-
-
     private final PasswordEncoder passwordEncoder;
 
     public AuthController(AuthenticationManager authenticationManager,
