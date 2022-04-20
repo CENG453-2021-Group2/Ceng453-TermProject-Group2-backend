@@ -30,7 +30,6 @@ public class Player {
 
     @Column(length = 255, nullable = false)
     private String username;
-
     @Column(length = 255, nullable = false)
     private String password;
     @Column(length = 255, nullable = false)
