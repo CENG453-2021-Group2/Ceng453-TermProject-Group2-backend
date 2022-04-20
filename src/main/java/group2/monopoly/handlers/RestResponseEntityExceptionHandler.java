@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
@@ -54,6 +55,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     protected ResponseEntity handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                           HttpHeaders headers, HttpStatus status,
                                                           WebRequest request) {
+        headers.setContentType(MediaType.APPLICATION_JSON);
         final List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
         Map<String, Set<String>> errorsMap = fieldErrors.stream().collect(
                 Collectors.groupingBy(FieldError::getField,
@@ -86,7 +88,9 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         ObjectNode response = mapper.createObjectNode();
         response.put("success", false);
         response.put("message", exception.getMessage());
-        return new ResponseEntity(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response), httpHeaders, HttpStatus.UNAUTHORIZED);
     }
 
 
