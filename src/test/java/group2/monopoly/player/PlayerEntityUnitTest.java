@@ -1,6 +1,5 @@
 package group2.monopoly.player;
 
-import group2.monopoly.player.Player;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -8,27 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-class PlayerTest {
-
-    @org.junit.jupiter.api.Test
-    void getId() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            Player player = new Player(
-                    "username",
-                    "password",
-                    "email"
-            );
-        });
-
-        AtomicReference<Player> player = new AtomicReference<>(new Player(
-                "username",
-                "password",
-                "email"
-        ));
-        assertEquals(1L, player.get().getId());
-
-
-    }
+class PlayerEntityUnitTest {
 
 
     @org.junit.jupiter.api.Test
@@ -51,14 +30,6 @@ class PlayerTest {
 
         player.setUsername("newUsername");
         assertEquals("newUsername", player.getUsername());
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            player.setUsername(null);
-        });
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            player.setUsername("");
-        });
     }
 
     @org.junit.jupiter.api.Test
@@ -82,14 +53,6 @@ class PlayerTest {
 
         player.setPassword("newPassword");
         assertEquals("newPassword", player.getPassword());
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            player.setPassword(null);
-        });
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            player.setPassword("");
-        });
     }
 
     @org.junit.jupiter.api.Test
@@ -113,23 +76,5 @@ class PlayerTest {
 
         player.setEmail("newEmail");
         assertEquals("newEmail", player.getEmail());
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            player.setEmail(null);
-        });
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            player.setEmail("");
-        });
-    }
-
-    @org.junit.jupiter.api.Test
-    void testToString() {
-        Player player = new Player(
-                "username",
-                "password",
-                "email"
-        );
-        assertEquals("Player{id=1, username='username', password='password', email='email'}", player.toString());
     }
 }
