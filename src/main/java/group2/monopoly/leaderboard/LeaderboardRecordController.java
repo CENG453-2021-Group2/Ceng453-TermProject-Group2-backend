@@ -1,9 +1,10 @@
-package group2.monopoly.leaderboardPackage;
+package group2.monopoly.leaderboard;
 
-import com.example.demo.player.PlayerRepository;
+import group2.monopoly.player.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.example.demo.player.PlayerService;
+import group2.monopoly.payload.GenericResponse;
 
 import java.util.List;
 
@@ -26,18 +27,24 @@ public class LeaderboardRecordController {
     }
 
     @PostMapping("/save")
-    public void registerLeaderboardRecord(@RequestBody LeaderboardRecord leaderboardRecord) {
+    public ResponseEntity<GenericResponse> registerLeaderboardRecord(@RequestBody LeaderboardRecord leaderboardRecord) {
         Long playerId = leaderboardRecord.getId();
-        if (playerRepository.findPlayerbyId(playerId).isEmpty()) {
-            throw new RuntimeException("Player with id " + playerId + " does not exist");
+        if (playerRepository.findById(playerId).isEmpty()) {
+            return ResponseEntity.badRequest().body( GenericResponse.error("Player not found"));
         }
         leaderboardRecordRepository.save(leaderboardRecord);
+        return ResponseEntity.ok(GenericResponse.message("LeaderboardRecord saved"));
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deleteLeaderboardRecord(@PathVariable("id") Long id) {
-        leaderboardRecordRepository.removeById(id);
+    public ResponseEntity<GenericResponse> deleteLeaderboardRecord(@PathVariable("id") Long id) {
+        try {
+            leaderboardRecordRepository.removeById(id);
+            return ResponseEntity.ok(GenericResponse.message("LeaderboardRecord deleted"));
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.badRequest().body(GenericResponse.error("LeaderboardRecord not found"));
+        }
     }
-
 
 }

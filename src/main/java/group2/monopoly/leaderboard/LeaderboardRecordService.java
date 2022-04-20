@@ -1,4 +1,4 @@
-package group2.monopoly.leaderboardPackage;
+package group2.monopoly.leaderboard;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

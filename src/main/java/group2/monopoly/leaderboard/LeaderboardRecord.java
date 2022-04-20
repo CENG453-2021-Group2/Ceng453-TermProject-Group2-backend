@@ -1,4 +1,4 @@
-package group2.monopoly.leaderboardPackage;
+package group2.monopoly.leaderboard;
 
 import javax.persistence.*;
 
