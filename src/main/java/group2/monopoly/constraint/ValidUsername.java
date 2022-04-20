@@ -10,7 +10,9 @@ import java.lang.annotation.RetentionPolicy;
 @Constraint(validatedBy = UsernameConstraintValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidUsername {
-    String message() default "Invalid username";
+    String message() default "{group2.monopoly.constraint.ValidUsername.message}";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }
