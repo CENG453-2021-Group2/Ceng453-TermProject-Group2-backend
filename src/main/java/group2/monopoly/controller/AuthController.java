@@ -9,7 +9,7 @@ import group2.monopoly.player.PlayerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.PlayernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,7 +44,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<GenericResponse> authenticatePlayer(@RequestBody LoginDto loginDto) {
         Authentication authentication =
-                authenticationManager.authenticate(new PlayernamePasswordAuthenticationToken(
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                         loginDto.getUsername(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return new ResponseEntity<>(GenericResponse.message("success"), HttpStatus.OK);
