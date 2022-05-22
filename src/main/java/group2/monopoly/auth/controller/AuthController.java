@@ -1,4 +1,4 @@
-package group2.monopoly.controller;
+package group2.monopoly.auth.controller;
 
 
 import group2.monopoly.payload.GenericResponse;

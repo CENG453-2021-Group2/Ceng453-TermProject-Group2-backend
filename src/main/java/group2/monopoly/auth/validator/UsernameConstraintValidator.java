@@ -1,27 +1,29 @@
-package group2.monopoly.constraint;
+package group2.monopoly.auth.validator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+/*
+ * This class is used to validate the username.
+ * It checks if the username is valid.
+ */
 public class UsernameConstraintValidator implements ConstraintValidator<ValidUsername, String> {
-    /*
-    * This class is used to validate the username.
-    * It checks if the username is valid.
-    * */
+
 
     @Override
     public void initialize(ValidUsername contactNumber) {
     }
 
+    /*
+     * This method checks if the username is valid.
+     * @param username the username to be validated
+     * @param context the context of the validation
+     * @return true if the username is valid, false otherwise
+     */
     @Override
     public boolean isValid(String username,
                            ConstraintValidatorContext constraintValidatorContext) {
-        /*
-        * This method checks if the username is valid.
-        * @param username the username to be validated
-        * @param context the context of the validation
-        * @return true if the username is valid, false otherwise
-         */
+
         // 4-16 alphanumeric characters
         if (username != null && username.matches("\\w{4,16}+")) {
             return true;

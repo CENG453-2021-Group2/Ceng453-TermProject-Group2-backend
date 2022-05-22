@@ -1,4 +1,4 @@
-package group2.monopoly.constraint;
+package group2.monopoly.auth.validator;
 
 import org.passay.*;
 

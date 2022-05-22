@@ -1,4 +1,4 @@
-package group2.monopoly.payload;
+package group2.monopoly.auth.payload;
 
 import lombok.Data;
 

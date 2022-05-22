@@ -1,7 +1,7 @@
-package group2.monopoly.payload;
+package group2.monopoly.auth.payload;
 
-import group2.monopoly.constraint.ValidPassword;
-import group2.monopoly.constraint.ValidUsername;
+import group2.monopoly.auth.validator.ValidPassword;
+import group2.monopoly.auth.validator.ValidUsername;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
