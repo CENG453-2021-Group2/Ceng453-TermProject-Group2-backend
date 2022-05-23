@@ -45,7 +45,7 @@ public class User implements UserDetails {
 
     @NonNull
     @NotBlank
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(length = 63, nullable = false)
     private String password;
 
