@@ -4,14 +4,15 @@ package group2.monopoly.auth.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import group2.monopoly.auth.exception.BasicAuthException;
 import group2.monopoly.auth.model.User;
+import group2.monopoly.auth.payload.LoginDto;
 import group2.monopoly.auth.payload.PasswordResetRequestDTO;
+import group2.monopoly.auth.payload.SignUpDto;
 import group2.monopoly.auth.payload.UserSettingsChangeDTO;
 import group2.monopoly.auth.service.UserPasswordResetService;
 import group2.monopoly.auth.service.UserService;
-import group2.monopoly.payload.GenericResponse;
-import group2.monopoly.auth.payload.LoginDto;
-import group2.monopoly.auth.payload.SignUpDto;
+import group2.monopoly.mapper.ObjectMapperSingleton;
 import io.vavr.control.Either;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,17 +38,15 @@ public class AuthController {
 
     private final UserService userService;
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = ObjectMapperSingleton.getMapper();
 
     private final UserPasswordResetService userPasswordResetService;
 
     @Autowired
     public AuthController(AuthenticationManager authenticationManager, UserService userService,
-                          ObjectMapper objectMapper,
                           UserPasswordResetService userPasswordResetService) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
-        this.objectMapper = objectMapper;
         this.userPasswordResetService = userPasswordResetService;
     }
 
@@ -78,14 +77,12 @@ public class AuthController {
      * @return A response entity with either the created user or error description.
      */
     @PostMapping("/register")
-    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignUpDto signUpDto) {
-        ObjectNode responseBody = objectMapper.createObjectNode();
-
+    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignUpDto signUpDto) throws BasicAuthException {
+        if (signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
+            throw new BasicAuthException("passwords should match");
+        }
         Either<String, User> result = userService.createUser(signUpDto);
-
-        return result.fold(message -> ResponseEntity.badRequest().body(responseBody.set("errors",
-                        objectMapper.createArrayNode().add(message))),
-                user -> ResponseEntity.status(HttpStatus.CREATED).body(user));
+        return ResponseEntity.status(HttpStatus.CREATED).body(result.getOrElseThrow(BasicAuthException::new));
     }
 
     /**
@@ -116,23 +113,21 @@ public class AuthController {
      * errors.
      */
     @PostMapping("/resetPassword")
-    public ResponseEntity<JsonNode> resetPassword(@Valid @RequestBody PasswordResetRequestDTO passwordResetRequestDTO) {
-        Optional<User> user =
+    public ResponseEntity<JsonNode> resetPassword(@Valid @RequestBody PasswordResetRequestDTO passwordResetRequestDTO) throws BasicAuthException {
+        Optional<User> optionalUser =
                 userPasswordResetService.resetPassword(passwordResetRequestDTO.getToken(),
                         passwordResetRequestDTO.getPassword());
-        if (user.isPresent()) {
-            return ResponseEntity.ok().body(objectMapper.createObjectNode().put("message",
-                    "password successfully changed for user " + user.orElseThrow().getUsername()));
-        }
-
-        return ResponseEntity.badRequest().body(objectMapper.createObjectNode().set("errors",
-                objectMapper.createArrayNode().add("token either does not exist or is expired")));
+        User user = optionalUser.orElseThrow(() -> new BasicAuthException("token either does not " +
+                "exist " +
+                "or is expired"));
+        return ResponseEntity.ok().body(objectMapper.createObjectNode().put("message",
+                "password successfully changed for user " + user.getUsername()));
     }
 
     /**
      * Returns the account settings of the currently logged-in user.
      *
-     * @return
+     * @return JSON representation of the user
      */
     @GetMapping("user")
     public ResponseEntity<User> getUserSettings() {
@@ -146,10 +141,11 @@ public class AuthController {
      * Password, username, and email can be changed. For any of these (old) password should be
      * supplied as well. Changing username or email invalidates existing password reset tokens.
      *
-     * @return
+     * @param dto user account settings to be updated
+     * @return JSON representation of the user
      */
     @PostMapping("user")
-    public ResponseEntity<Object> postUserSettings(@Valid @RequestBody UserSettingsChangeDTO dto) {
+    public ResponseEntity<Object> postUserSettings(@Valid @RequestBody UserSettingsChangeDTO dto) throws BasicAuthException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // Password validation
@@ -158,28 +154,12 @@ public class AuthController {
 
         if (newPassword == null && confirmNewPassword == null || newPassword != null && newPassword.equals(confirmNewPassword)) {
             if (dto.getEmail() == null && dto.getNewPassword() == null && dto.getUsername() == null) {
-                return ResponseEntity
-                        .badRequest()
-                        .body(objectMapper
-                                .createObjectNode()
-                                .set("errors", objectMapper.
-                                        createArrayNode()
-                                        .add("At least one of 'username', 'email', 'newPassword' " +
-                                                "fields should be provided.")));
+                throw new BasicAuthException("At least one of 'username', 'email', " +
+                        "'newPassword' fields should be provided.");
             }
             Either<String, User> eitherUser = userService.updateUser(user, dto);
-            return eitherUser.fold(
-                    errorMessage -> ResponseEntity
-                            .badRequest()
-                            .body(objectMapper
-                                    .createObjectNode()
-                                    .set("errors", objectMapper
-                                            .createArrayNode()
-                                            .add(errorMessage)))
-                    , ResponseEntity::ok
-            );
+            return ResponseEntity.ok(eitherUser.getOrElseThrow(BasicAuthException::new));
         }
-        return ResponseEntity.badRequest().body(objectMapper.createObjectNode().set("errors",
-                objectMapper.createArrayNode().add("new passwords should be matching")));
+        throw new BasicAuthException("new passwords should be matching");
     }
 }
