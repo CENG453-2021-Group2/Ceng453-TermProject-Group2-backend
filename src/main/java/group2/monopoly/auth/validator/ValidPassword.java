@@ -16,8 +16,6 @@ import static java.lang.annotation.ElementType.*;
 @Target({TYPE, FIELD, ANNOTATION_TYPE})
 public @interface ValidPassword {
     String message() default "{group2.monopoly.auth.validator.ValidPassword.message}";
-
     Class<?>[] groups() default {};
-
     Class<? extends Payload>[] payload() default {};
 }

@@ -12,8 +12,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidUsername {
     String message() default "{group2.monopoly.auth.validator.ValidUsername.message}";
-
     Class<?>[] groups() default {};
-
     Class<? extends Payload>[] payload() default {};
 }

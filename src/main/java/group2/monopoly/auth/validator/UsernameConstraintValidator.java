@@ -9,7 +9,6 @@ import javax.validation.ConstraintValidatorContext;
  */
 public class UsernameConstraintValidator implements ConstraintValidator<ValidUsername, String> {
 
-
     @Override
     public void initialize(ValidUsername contactNumber) {
     }
@@ -25,7 +24,7 @@ public class UsernameConstraintValidator implements ConstraintValidator<ValidUse
                            ConstraintValidatorContext constraintValidatorContext) {
 
         // 4-16 alphanumeric characters
-        if (username != null && username.matches("\\w{4,16}+")) {
+        if (username.matches("\\w{4,16}+")) {
             return true;
         }
 
