@@ -1,7 +1,7 @@
-package group2.monopoly.auth.entity;
+package group2.monopoly.auth.repository;
 
-import group2.monopoly.auth.repository.UserPasswordResetRepository;
-import group2.monopoly.auth.repository.UserRepository;
+import group2.monopoly.auth.entity.User;
+import group2.monopoly.auth.entity.UserPasswordReset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 @DataJpaTest
-class UserPasswordResetTest {
+class UserPasswordResetRepositoryTest {
     @Autowired
     UserRepository userRepository;
 
