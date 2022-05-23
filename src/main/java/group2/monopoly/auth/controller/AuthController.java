@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import group2.monopoly.auth.exception.BasicAuthException;
-import group2.monopoly.auth.model.User;
+import group2.monopoly.auth.entity.User;
 import group2.monopoly.auth.payload.LoginDto;
 import group2.monopoly.auth.payload.PasswordResetRequestDTO;
 import group2.monopoly.auth.payload.SignUpDto;

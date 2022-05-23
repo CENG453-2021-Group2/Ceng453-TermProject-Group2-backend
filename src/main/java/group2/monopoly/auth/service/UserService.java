@@ -1,6 +1,6 @@
 package group2.monopoly.auth.service;
 
-import group2.monopoly.auth.model.User;
+import group2.monopoly.auth.entity.User;
 import group2.monopoly.auth.payload.SignUpDto;
 import group2.monopoly.auth.payload.UserSettingsChangeDTO;
 import group2.monopoly.auth.repository.UserRepository;

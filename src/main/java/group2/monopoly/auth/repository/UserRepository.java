@@ -1,6 +1,6 @@
 package group2.monopoly.auth.repository;
 
-import group2.monopoly.auth.model.User;
+import group2.monopoly.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,7 +1,7 @@
 package group2.monopoly.auth.service;
 
-import group2.monopoly.auth.model.User;
-import group2.monopoly.auth.model.UserPasswordReset;
+import group2.monopoly.auth.entity.User;
+import group2.monopoly.auth.entity.UserPasswordReset;
 import group2.monopoly.auth.repository.UserPasswordResetRepository;
 import group2.monopoly.auth.repository.UserRepository;
 import group2.monopoly.mail.EmailService;

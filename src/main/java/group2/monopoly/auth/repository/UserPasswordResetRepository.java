@@ -1,11 +1,10 @@
 package group2.monopoly.auth.repository;
 
-import group2.monopoly.auth.model.User;
-import group2.monopoly.auth.model.UserPasswordReset;
+import group2.monopoly.auth.entity.User;
+import group2.monopoly.auth.entity.UserPasswordReset;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 

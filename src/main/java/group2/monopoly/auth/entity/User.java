@@ -1,4 +1,4 @@
-package group2.monopoly.auth.model;
+package group2.monopoly.auth.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
