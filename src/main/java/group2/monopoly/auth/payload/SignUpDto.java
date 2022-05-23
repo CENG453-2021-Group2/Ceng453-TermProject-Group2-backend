@@ -8,7 +8,11 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
 /**
- * It's a DTO that contains a username, email, and password
+ * DTO used for creating new accounts.
+ * <br>
+ * Fields are subject to validations {@link ValidUsername}, {@link Email}, and
+ * {@link ValidPassword} where applicable and can't be null. Furthermore, fields
+ * {@link #password} and {@link #confirmPassword} should match.
  */
 @Data
 public class SignUpDto {

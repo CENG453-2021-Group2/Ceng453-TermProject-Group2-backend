@@ -8,6 +8,9 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
+/**
+ * Password reset request DTO. {@link #password} and {@link #confirmPassword} fields should match.
+ */
 @Data
 @ValidPasswordResetRequestDTO
 public class PasswordResetRequestDTO {

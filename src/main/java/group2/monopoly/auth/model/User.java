@@ -11,7 +11,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * {@link Entity} class that also implements {@link UserDetails}.
@@ -29,6 +28,9 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     private Long id;
 
+    /**
+     * Whether the account is active. Deleting an account is done by setting this to false.
+     */
     @NonNull
     @Builder.Default
     @Column(nullable=false)

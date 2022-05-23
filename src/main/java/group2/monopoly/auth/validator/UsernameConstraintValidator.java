@@ -13,10 +13,11 @@ public class UsernameConstraintValidator implements ConstraintValidator<ValidUse
     public void initialize(ValidUsername contactNumber) {
     }
 
-    /*
+    /**
      * This method checks if the username is valid.
+     *
      * @param username the username to be validated
-     * @param context the context of the validation
+     * @param constraintValidatorContext  the context of the validation
      * @return true if the username is valid, false otherwise
      */
     @Override

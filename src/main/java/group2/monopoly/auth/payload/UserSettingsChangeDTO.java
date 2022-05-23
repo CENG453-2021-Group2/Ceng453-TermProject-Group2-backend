@@ -7,8 +7,14 @@ import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 
+/**
+ * DTO for changing user account settings.
+ * <br>
+ * Settings that are not intended to be changed should be omitted.
+ * The fields are validated with validators {@link ValidUsername}, {@link Email},
+ * {@link ValidPassword} where applicable. If new password fields are supplied, they should match.
+ */
 @Data
 public class UserSettingsChangeDTO {
     @Nullable

@@ -14,8 +14,10 @@ import javax.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collector;
 
+/**
+ * Service providing password reset features including token generation.
+ */
 @Service
 public class UserPasswordResetService {
     private static final long MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
@@ -63,7 +65,7 @@ public class UserPasswordResetService {
     /**
      * Creates a new password reset token and invalidates old one given a User.
      * <br>
-     * A random UUID is while generating the token and the token is valid for two days.
+     * A random UUID is while generating the token, and the token is valid for two days.
      *
      * @param user The account object
      * @return Generated password reset token if such account exists
@@ -78,7 +80,7 @@ public class UserPasswordResetService {
     /**
      * Creates a new password reset token and invalidates old one given an account identifier.
      * <br>
-     * A random UUID is while generating the token and the token is valid for two days.
+     * A random UUID is while generating the token, and the token is valid for two days.
      *
      * @param identifier Email or username of an account
      * @return Generated password reset token if such account exists

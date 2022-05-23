@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * JPA repository for storing temporary user password reset tokens.
+ */
 public interface UserPasswordResetRepository extends JpaRepository<UserPasswordReset, Long> {
     Optional<UserPasswordReset> findUserPasswordResetByUser(User user);
     Optional<UserPasswordReset> findUserPasswordResetByUserAndValidUntilBefore(User user, @NonNull Date validUntil);
