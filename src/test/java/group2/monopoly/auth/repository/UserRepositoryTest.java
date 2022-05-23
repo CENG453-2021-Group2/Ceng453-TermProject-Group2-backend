@@ -1,7 +1,6 @@
 package group2.monopoly.auth.repository;
 
 import group2.monopoly.auth.entity.User;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +30,7 @@ class UserRepositoryTest {
                         "example1").roles(new TreeSet(Set.of("USER"))).build(),
                 User.builder().username("example2").email("example2@example.com").password(
                         "example2").roles(new TreeSet(Set.of("USER", "ADMIN"))).build()
-                ).forEach(userRepository::save);
+        ).forEach(userRepository::save);
     }
 
     @Test
