@@ -148,6 +148,9 @@ public class AuthController {
     public ResponseEntity<Object> postUserSettings(@Valid @RequestBody UserSettingsChangeDTO dto) throws BasicAuthException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        // Authentication
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword()));
+
         // Password validation
         String newPassword = dto.getNewPassword();
         String confirmNewPassword = dto.getConfirmNewPassword();
