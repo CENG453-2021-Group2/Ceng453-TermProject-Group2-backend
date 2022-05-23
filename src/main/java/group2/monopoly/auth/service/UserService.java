@@ -73,7 +73,7 @@ public class UserService {
             return left("email exists");
         }
 
-        if (userRepository.existsByEmail(username)) {
+        if (userRepository.existsByUsername(username)) {
             return left("username exists");
         }
 
@@ -123,6 +123,9 @@ public class UserService {
                 .flatMap(u ->
                         Optional.ofNullable(dto.getNewPassword())
                                 .map(password -> {
+                                    if (dto.getPassword().equals(dto.getNewPassword())) {
+                                        return Either.<String, User>left("new password is the same as the previous one");
+                                    }
                                     u.setPassword(password);
                                     return Either.<String, User>right(u);
                                 })
@@ -154,7 +157,7 @@ public class UserService {
                 .orElse(Either.right(user))
                 .flatMap(u -> {
                     if (user.getUsername().equals(username)) {
-                        return Either.left("new email is the same as the previous one");
+                        return Either.left("new username is the same as the previous one");
                     }
                     user.setUsername(username);
                     return Either.right(u);
