@@ -9,8 +9,8 @@
         <version>2.6.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.example</groupId>
-    <artifactId>demo1</artifactId>
+    <groupId>com.monopoly</groupId>
+    <artifactId>monopoly</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>demo1</name>
     <description>demo1</description>
@@ -85,6 +85,11 @@
             <groupId>io.vavr</groupId>
             <artifactId>vavr</artifactId>
             <version>1.0.0-alpha-4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>2.6.7</version>
         </dependency>
     </dependencies>
 
