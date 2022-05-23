@@ -6,7 +6,6 @@ import group2.monopoly.auth.payload.PasswordResetRequestDTO;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-//public class PasswordResetRequestDTOValidator implements ConstraintValidator<ValidPasswordResetRequestDTO, PasswordResetRequestDTO> {
 public class PasswordResetRequestDTOValidator implements ConstraintValidator<ValidPasswordResetRequestDTO, PasswordResetRequestDTO> {
     @Override
     public void initialize(ValidPasswordResetRequestDTO constraintAnnotation) {
