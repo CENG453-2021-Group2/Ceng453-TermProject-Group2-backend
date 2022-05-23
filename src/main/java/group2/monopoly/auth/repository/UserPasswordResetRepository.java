@@ -14,11 +14,9 @@ import java.util.UUID;
  */
 public interface UserPasswordResetRepository extends JpaRepository<UserPasswordReset, Long> {
     Optional<UserPasswordReset> findUserPasswordResetByUser(User user);
-    Optional<UserPasswordReset> findUserPasswordResetByUserAndValidUntilBefore(User user, @NonNull Date validUntil);
+
     Optional<UserPasswordReset> findUserPasswordResetByToken(@NonNull UUID token);
 
-    Boolean existsByUser(User user);
-    Boolean existsByUserAndValidUntilBefore(User user, @NonNull Date validUntil);
 
     void deleteAllByUser(User user);
 }
