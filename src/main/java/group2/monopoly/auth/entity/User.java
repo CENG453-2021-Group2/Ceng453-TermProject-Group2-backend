@@ -57,9 +57,6 @@ public class User implements UserDetails {
     @ElementCollection
     private Set<String> roles = new HashSet<>();
 
-//    @OneToMany(mappedBy = "token", fetch = FetchType.EAGER)
-//    private Set<UserPasswordReset> passwordResets;
-
     /**
      * Constructs a new user.
      *
@@ -89,14 +86,13 @@ public class User implements UserDetails {
 
     @Builder
     private User(Long id, @NonNull Boolean active, @NonNull String username, @NonNull String email
-            , @NonNull String password, Set<String> roles /*Set<UserPasswordReset> passwordResets*/) {
+            , @NonNull String password, Set<String> roles) {
         this.id = id;
         this.active = active;
         this.username = username;
         this.email = email;
         this.password = password;
         this.roles = roles;
-//        this.passwordResets = passwordResets;
     }
 
     @Override
