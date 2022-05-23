@@ -4,14 +4,16 @@ import group2.monopoly.auth.model.User;
 import group2.monopoly.auth.payload.SignUpDto;
 import group2.monopoly.auth.payload.UserSettingsChangeDTO;
 import group2.monopoly.auth.repository.UserRepository;
-import io.vavr.collection.Tree;
 import io.vavr.control.Either;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -107,28 +109,27 @@ public class UserService {
 
     public Either<String, User> updateUser(@NonNull User user, UserSettingsChangeDTO dto) {
         Either<String, User> eitherUser = Either.right(user);
-        eitherUser
+        eitherUser = eitherUser
                 .flatMap(u ->
-                    Optional.ofNullable(dto.getUsername())
-                            .map(username -> updateUsername(u, username))
-                            .orElse(Either.right(u))
+                        Optional.ofNullable(dto.getUsername())
+                                .map(username -> updateUsername(u, username))
+                                .orElse(Either.right(u))
                 )
                 .flatMap(u ->
-                    Optional.ofNullable(dto.getEmail())
-                            .map(email -> updateEmail(u, email))
-                            .orElse(Either.right(u))
+                        Optional.ofNullable(dto.getEmail())
+                                .map(email -> updateEmail(u, email))
+                                .orElse(Either.right(u))
                 )
                 .flatMap(u ->
-                    Optional.ofNullable(dto.getNewPassword())
-                            .map(password -> {
-                                u.setPassword(password);
-                                return Either.<String, User>right(u);
-                            })
-                            .orElse(Either.right(u))
-                );
-
+                        Optional.ofNullable(dto.getNewPassword())
+                                .map(password -> {
+                                    u.setPassword(password);
+                                    return Either.<String, User>right(u);
+                                })
+                                .orElse(Either.right(u))
+                )
+                .peek(userRepository::save);
         return eitherUser;
-
     }
 
     private Either<String, User> updateEmail(User user, String email) {
@@ -149,7 +150,7 @@ public class UserService {
     private Either<String, User> updateUsername(User user, String username) {
         Optional<User> existingUser = userRepository.findByUsername(username);
         return existingUser.filter(u -> !u.equals(user))
-                .map(u -> Either.<String,User>left("user exists"))
+                .map(u -> Either.<String, User>left("user exists"))
                 .orElse(Either.right(user))
                 .flatMap(u -> {
                     if (user.getUsername().equals(username)) {
