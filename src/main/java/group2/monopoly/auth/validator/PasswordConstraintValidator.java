@@ -26,13 +26,6 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
     @Override
     public boolean isValid(String passwordString,
                            ConstraintValidatorContext constraintValidatorContext) {
-        if (passwordString == null) {
-            constraintValidatorContext.disableDefaultConstraintViolation();
-            constraintValidatorContext
-                    .buildConstraintViolationWithTemplate("Password cannot be empty.")
-                    .addConstraintViolation();
-            return false;
-        }
         PasswordValidator validator = new PasswordValidator(
                 new LengthRule(8, 64),
                 new CharacterRule(EnglishCharacterData.Alphabetical, 1),

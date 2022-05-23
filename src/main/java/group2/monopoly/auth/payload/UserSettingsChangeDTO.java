@@ -3,20 +3,19 @@ package group2.monopoly.auth.payload;
 import group2.monopoly.auth.validator.ValidPassword;
 import group2.monopoly.auth.validator.ValidUsername;
 import lombok.Data;
+import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
-/**
- * It's a DTO that contains a username, email, and password
- */
 @Data
-public class SignUpDto {
-    @NotNull
+public class UserSettingsChangeDTO {
+    @Nullable
     @ValidUsername
     private String username;
 
-    @NotNull
+    @Nullable
     @Email
     private String email;
 
@@ -24,7 +23,11 @@ public class SignUpDto {
     @ValidPassword
     private String password;
 
-    @NotNull
+    @Nullable
     @ValidPassword
-    private String confirmPassword;
+    private String newPassword;
+
+    @Nullable
+    @ValidPassword
+    private String confirmNewPassword;
 }

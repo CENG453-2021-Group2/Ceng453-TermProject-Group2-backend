@@ -1,24 +1,19 @@
 package group2.monopoly.auth.payload;
 
 import group2.monopoly.auth.validator.ValidPassword;
-import group2.monopoly.auth.validator.ValidUsername;
+import group2.monopoly.auth.validator.ValidPasswordResetRequestDTO;
+import group2.monopoly.auth.validator.ValidUuid;
 import lombok.Data;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
-/**
- * It's a DTO that contains a username, email, and password
- */
 @Data
-public class SignUpDto {
+@ValidPasswordResetRequestDTO
+public class PasswordResetRequestDTO {
     @NotNull
-    @ValidUsername
-    private String username;
-
-    @NotNull
-    @Email
-    private String email;
+    @ValidUuid
+    private UUID token;
 
     @NotNull
     @ValidPassword
