@@ -12,10 +12,9 @@ import java.util.UUID;
  * JPA repository for storing temporary user password reset tokens.
  */
 public interface UserPasswordResetRepository extends JpaRepository<UserPasswordReset, Long> {
-    Optional<UserPasswordReset> findUserPasswordResetByUser(User user);
+    Optional<UserPasswordReset> findFirstByUserOrderByValidUntilDesc(User user);
 
-    Optional<UserPasswordReset> findUserPasswordResetByToken(@NonNull UUID token);
-
+    Optional<UserPasswordReset> findUserPasswordResetByTokenEquals(@NonNull UUID token);
 
     void deleteAllByUser(User user);
 }

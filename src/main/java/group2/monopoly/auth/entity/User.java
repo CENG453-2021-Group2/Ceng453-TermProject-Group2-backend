@@ -15,17 +15,20 @@ import java.util.stream.Collectors;
 /**
  * {@link Entity} class that also implements {@link UserDetails}.
  * <br><br>
- * {@link #isAccountNonLocked()} method checks active {@link #active} field. Other predicates always return true.
+ * {@link #isAccountNonLocked()} method checks active {@link #active} field. Other predicates
+ * always return true.
  */
 @Getter
 @Setter
 @ToString
-@Entity
+@Builder
+@Entity(name = "users")
 @NoArgsConstructor
 public class User implements UserDetails {
     @Id
     @SequenceGenerator(name = "user_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    @Column(name="id")
     private Long id;
 
     /**
@@ -33,16 +36,16 @@ public class User implements UserDetails {
      */
     @NonNull
     @Builder.Default
-    @Column(nullable=false)
+    @Column(name="active", nullable = false)
     private Boolean active = true;
 
     @NonNull
-    @Column(nullable = false, unique = true)
+    @Column(name="username", nullable = false, unique = true)
     private String username;
 
     @NonNull
     @NotBlank
-    @Column(nullable = false)
+    @Column(name="email", nullable = false, unique = true)
     private String email;
 
     @NonNull
@@ -52,18 +55,21 @@ public class User implements UserDetails {
     private String password;
 
     @ElementCollection
-    private SortedSet<String> roles;
+    private Set<String> roles = new HashSet<>();
+
+//    @OneToMany(mappedBy = "token", fetch = FetchType.EAGER)
+//    private Set<UserPasswordReset> passwordResets;
 
     /**
      * Constructs a new user.
+     *
      * @param username username of the user to be created
-     * @param email email of the user to be created
+     * @param email    email of the user to be created
      * @param password hashed password of the user
-     * @param roles a set of roles the user has such as "ADMIN" or "USER"
+     * @param roles    a set of roles the user has such as "ADMIN" or "USER"
      */
-    @Builder
     public User(@NonNull String username, @NonNull String email, @NonNull String password,
-                @NonNull SortedSet<String> roles) {
+                @NonNull Set<String> roles) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -71,13 +77,26 @@ public class User implements UserDetails {
     }
 
     /**
-     * @see User#User(String, String, String, SortedSet)
+     * @see User#User(String, String, String, Set)
      */
     public User(@NonNull String username, @NonNull String email, @NonNull String password) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.roles = new TreeSet<>(Collections.singleton("USER"));
+    }
+
+
+    @Builder
+    private User(Long id, @NonNull Boolean active, @NonNull String username, @NonNull String email
+            , @NonNull String password, Set<String> roles /*Set<UserPasswordReset> passwordResets*/) {
+        this.id = id;
+        this.active = active;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.roles = roles;
+//        this.passwordResets = passwordResets;
     }
 
     @Override
@@ -96,11 +115,12 @@ public class User implements UserDetails {
 
     /**
      * Creates a collection of SimpleGrantedAuthority from roles.
+     *
      * @return A naturally ordered {@link TreeSet}
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toCollection(TreeSet::new));
+        return getRoles().stream().map(SimpleGrantedAuthority::new).sorted().collect(Collectors.toList());
     }
 
     @Override

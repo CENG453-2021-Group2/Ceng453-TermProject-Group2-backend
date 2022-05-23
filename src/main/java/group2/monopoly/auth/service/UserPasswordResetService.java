@@ -49,7 +49,7 @@ public class UserPasswordResetService {
      * @return Password reset token object
      */
     public UserPasswordReset generateNewToken(@NonNull User user, Date validUntil, UUID uuid) {
-        userPasswordResetRepository.findUserPasswordResetByUser(user).ifPresent(userPasswordResetRepository::delete);
+        userPasswordResetRepository.deleteAllByUser(user);
         UserPasswordReset newToken = new UserPasswordReset();
         newToken.setUser(user);
         newToken.setToken(uuid);
@@ -106,7 +106,8 @@ public class UserPasswordResetService {
      */
     public Optional<User> resetPassword(@NonNull UUID token, String newPassword) {
         Optional<UserPasswordReset> passwordReset =
-                userPasswordResetRepository.findUserPasswordResetByToken(token);
+                userPasswordResetRepository.findUserPasswordResetByTokenEquals(token)
+                        .filter(t -> t.getValidUntil().before(new Date()));
         if (passwordReset.isPresent()) {
             Optional<User> optionalUser = passwordReset.map(UserPasswordReset::getUser);
             optionalUser.ifPresent(user -> {
