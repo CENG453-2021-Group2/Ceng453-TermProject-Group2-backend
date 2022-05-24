@@ -23,6 +23,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Checks the correctness of {@link UserService} with injected mock repository and encoder objects.
+ */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
@@ -61,7 +64,7 @@ class UserServiceTest {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(userRepository.existsByUsername(anyString())).thenReturn(true);
         Either<String, User> user = userService.createUser("username", "email", "password");
-        assertEquals(user, Either.left("email exists"));
+        assertEquals(user, Either.left("username exists"));
     }
 
     @Test

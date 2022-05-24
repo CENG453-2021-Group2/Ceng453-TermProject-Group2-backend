@@ -7,10 +7,8 @@ import group2.monopoly.auth.repository.UserRepository;
 import group2.monopoly.mail.EmailService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -26,6 +24,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Checks the correctness of {@link UserPasswordResetService} with injected mock repository,
+ * encoder, and email service objects.
+ */
 @ExtendWith(MockitoExtension.class)
 class UserPasswordResetServiceTest {
     private static final List<User> users = List.of(new User("username", "email", "password"));

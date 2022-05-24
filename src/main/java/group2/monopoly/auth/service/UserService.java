@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -40,7 +41,7 @@ public class UserService {
      * @return Either the newly created user or the error message
      * @see #createUser(String, String, String)
      */
-    public Either<String, User> createUser(SignUpDto signUpDto) {
+    public Either<String, User> createUser(@NotNull SignUpDto signUpDto) {
         return createUser(signUpDto.getUsername(), signUpDto.getEmail(), signUpDto.getPassword());
     }
 
