@@ -31,6 +31,7 @@ public class AuthExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({BasicAuthException.class})
     public ResponseEntity<JsonNode> handleBasicAuthException(BasicAuthException exception,
                                                              WebRequest webRequest) {
         JsonNode response = mapper.createObjectNode().put("message", exception.getMessage());
