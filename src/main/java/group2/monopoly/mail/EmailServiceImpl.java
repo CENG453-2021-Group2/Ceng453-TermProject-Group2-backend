@@ -1,16 +1,23 @@
 package group2.monopoly.mail;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailServiceImpl implements EmailService {
     private static final String NO_REPLY_ADDRESS = "";
 
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
+
+    @Bean
+    public static JavaMailSender mailSender() {
+        return new JavaMailSenderImpl();
+    }
 
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender) {
