@@ -107,7 +107,7 @@ public class UserPasswordResetService {
     public Optional<User> resetPassword(@NonNull UUID token, String newPassword) {
         Optional<UserPasswordReset> passwordReset =
                 userPasswordResetRepository.findUserPasswordResetByTokenEquals(token)
-                        .filter(t -> t.getValidUntil().before(new Date()));
+                        .filter(t -> t.getValidUntil().after(new Date()));
         if (passwordReset.isPresent()) {
             Optional<User> optionalUser = passwordReset.map(UserPasswordReset::getUser);
             optionalUser.ifPresent(user -> {
