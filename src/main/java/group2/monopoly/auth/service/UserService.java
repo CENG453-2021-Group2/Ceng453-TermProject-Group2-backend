@@ -7,6 +7,7 @@ import group2.monopoly.auth.repository.UserRepository;
 import io.vavr.control.Either;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,25 @@ public class UserService {
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    /**
+     * Checks supplied raw password.
+     * @param userDetails User the password is being checked against.
+     * @param password Raw password
+     * @return true if raw password matches the user's encoded password after encoding.
+     */
+    public boolean passwordMatches(UserDetails userDetails, String password) {
+        return passwordEncoder.matches(password, userDetails.getPassword());
+    }
+
+    /**
+     * Promotes {@link UserDetails} object to a {@link User}.
+     * @param userDetails user details object
+     * @return user object with matching username
+     */
+    public User promoteToUser(UserDetails userDetails) {
+        return userRepository.findUserByUsername(userDetails.getUsername());
     }
 
     /**
