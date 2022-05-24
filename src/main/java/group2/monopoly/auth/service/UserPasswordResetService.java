@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotBlank;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,9 +74,8 @@ public class UserPasswordResetService {
      * @see #generateNewToken(User, Date, UUID)
      */
     public UserPasswordReset generateNewToken(@NonNull User user) {
-        Date date = new Date();
-        date.setTime(date.getTime() + 2 * MILLISECONDS_IN_DAY);
-        return generateNewToken(user, date, UUID.randomUUID());
+        Date twoDaysLater = Date.from(Instant.now().plus(2, ChronoUnit.DAYS));
+        return generateNewToken(user, twoDaysLater, UUID.randomUUID());
     }
 
     /**
