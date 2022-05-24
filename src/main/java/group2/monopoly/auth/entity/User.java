@@ -71,6 +71,7 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.roles = roles;
+        this.active = true;
     }
 
     /**
@@ -81,6 +82,7 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.roles = new TreeSet<>(Collections.singleton("USER"));
+        this.active = true;
     }
 
 
@@ -93,6 +95,7 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.roles = roles;
+        this.active = true;
     }
 
     @Override
