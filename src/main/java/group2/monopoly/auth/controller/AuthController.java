@@ -4,8 +4,8 @@ package group2.monopoly.auth.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import group2.monopoly.auth.exception.BasicAuthException;
 import group2.monopoly.auth.entity.User;
+import group2.monopoly.auth.exception.BasicAuthException;
 import group2.monopoly.auth.payload.LoginDto;
 import group2.monopoly.auth.payload.PasswordResetRequestDTO;
 import group2.monopoly.auth.payload.SignUpDto;
@@ -13,6 +13,7 @@ import group2.monopoly.auth.payload.UserSettingsChangeDTO;
 import group2.monopoly.auth.service.UserPasswordResetService;
 import group2.monopoly.auth.service.UserService;
 import group2.monopoly.mapper.ObjectMapperSingleton;
+import group2.monopoly.validation.CustomGroupSequence;
 import io.vavr.control.Either;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Optional;
 
 /**
@@ -51,7 +52,8 @@ public class AuthController {
     }
 
     /**
-     * It takes a username and password, checks if they are valid, and if they are, it sets the
+     * It takes a username and password, checks if they are Validated(CustomGroupSequence.class,
+     * and if they are, it sets the
      * current
      * user to the user with that username
      *
@@ -61,7 +63,7 @@ public class AuthController {
      * @return A generic response with a message of "success"
      */
     @PostMapping("/login")
-    public ResponseEntity<ObjectNode> authenticateUser(@Valid @RequestBody LoginDto loginDto) {
+    public ResponseEntity<ObjectNode> authenticateUser(@Validated(CustomGroupSequence.class) @RequestBody LoginDto loginDto) {
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -77,9 +79,12 @@ public class AuthController {
      * @return A response entity with either the created user or error description.
      */
     @PostMapping("/register")
-    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignUpDto signUpDto) throws BasicAuthException {
-        if (signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
-            throw new BasicAuthException("passwords should match");
+    public ResponseEntity<Object> registerUser(@Validated(CustomGroupSequence.class) @RequestBody SignUpDto signUpDto) throws BasicAuthException {
+        if (!signUpDto.getPassword().equals(signUpDto.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body(objectMapper.createObjectNode().put("message"
+                    , "One or more fields could not be validated.").set("errors",
+                    objectMapper.createObjectNode().set("password",
+                            objectMapper.createArrayNode().add("passwords should be matching"))));
         }
         Either<String, User> result = userService.createUser(signUpDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(result.getOrElseThrow(BasicAuthException::new));
@@ -113,7 +118,7 @@ public class AuthController {
      * errors.
      */
     @PostMapping("/resetPassword")
-    public ResponseEntity<JsonNode> resetPassword(@Valid @RequestBody PasswordResetRequestDTO passwordResetRequestDTO) throws BasicAuthException {
+    public ResponseEntity<JsonNode> resetPassword(@Validated(CustomGroupSequence.class) @RequestBody PasswordResetRequestDTO passwordResetRequestDTO) throws BasicAuthException {
         Optional<User> optionalUser =
                 userPasswordResetService.resetPassword(passwordResetRequestDTO.getToken(),
                         passwordResetRequestDTO.getPassword());
@@ -145,7 +150,7 @@ public class AuthController {
      * @return JSON representation of the user
      */
     @PostMapping("user")
-    public ResponseEntity<Object> postUserSettings(@Valid @RequestBody UserSettingsChangeDTO dto) throws BasicAuthException {
+    public ResponseEntity<Object> postUserSettings(@Validated(CustomGroupSequence.class) @RequestBody UserSettingsChangeDTO dto) throws BasicAuthException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // Authentication

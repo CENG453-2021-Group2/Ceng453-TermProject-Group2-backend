@@ -2,6 +2,7 @@ package group2.monopoly.auth.payload;
 
 import group2.monopoly.auth.validator.ValidPassword;
 import group2.monopoly.auth.validator.ValidUsername;
+import group2.monopoly.validation.PostDefault;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
@@ -17,18 +18,18 @@ import javax.validation.constraints.NotNull;
 @Data
 public class SignUpDto {
     @NotNull
-    @ValidUsername
+    @ValidUsername(groups = {PostDefault.class})
     private String username;
 
     @NotNull
-    @Email
+    @Email(groups = {PostDefault.class})
     private String email;
 
     @NotNull
-    @ValidPassword
+    @ValidPassword(groups = {PostDefault.class})
     private String password;
 
     @NotNull
-    @ValidPassword
+    @ValidPassword(groups = {PostDefault.class})
     private String confirmPassword;
 }

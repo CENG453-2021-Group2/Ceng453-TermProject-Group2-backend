@@ -1,5 +1,6 @@
 package group2.monopoly.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -40,6 +41,7 @@ public class User implements UserDetails {
     private Boolean active = true;
 
     @NonNull
+    @NotBlank
     @Column(name="username", nullable = false, unique = true)
     private String username;
 
@@ -117,26 +119,31 @@ public class User implements UserDetails {
      *
      * @return A naturally ordered {@link TreeSet}
      */
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles().stream().map(SimpleGrantedAuthority::new).sorted().collect(Collectors.toList());
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return getActive();
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;

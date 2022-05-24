@@ -35,20 +35,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * If the request is to the /api/auth/** endpoint, allow it. Otherwise, require authentication.
-     * 
-     * @param http This is the object that allows configuring web based security for specific http
-     * requests.
-     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
-                .anyRequest()
-                .authenticated()
+                .antMatchers("/api/auth/user").authenticated() // user endpoint
+                .antMatchers("/api/auth/**").permitAll() // other auth endpoints
+                .anyRequest().authenticated() // remaining endpoints
                 .and()
                 .httpBasic();
     }

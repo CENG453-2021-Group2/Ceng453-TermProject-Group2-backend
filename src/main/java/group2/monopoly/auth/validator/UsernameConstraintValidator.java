@@ -31,7 +31,7 @@ public class UsernameConstraintValidator implements ConstraintValidator<ValidUse
 
         constraintValidatorContext.disableDefaultConstraintViolation();
         constraintValidatorContext.buildConstraintViolationWithTemplate(
-                "Username must be an alphanumeric string of length between 4 and 16."
+                "username must be an alphanumeric string of length between 4 and 16"
         ).addConstraintViolation();
         return false;
     }
