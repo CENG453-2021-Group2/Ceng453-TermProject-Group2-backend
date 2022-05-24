@@ -13,6 +13,7 @@ import group2.monopoly.auth.payload.UserSettingsChangeDTO;
 import group2.monopoly.auth.service.UserPasswordResetService;
 import group2.monopoly.auth.service.UserService;
 import group2.monopoly.mapper.ObjectMapperSingleton;
+import group2.monopoly.security.jwt.JwtHelper;
 import group2.monopoly.validation.CustomGroupSequence;
 import io.vavr.control.Either;
 import lombok.NonNull;
@@ -23,9 +24,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -34,6 +40,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping(value = "/api/auth", produces = "application/json", consumes = "application/json")
 public class AuthController {
+
+    private final JwtHelper jwtHelper;
+    private final UserDetailsService userDetailsService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -44,8 +53,10 @@ public class AuthController {
     private final UserPasswordResetService userPasswordResetService;
 
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UserService userService,
+    public AuthController(UserDetailsService userDetailsService, JwtHelper jwtHelper, AuthenticationManager authenticationManager, UserService userService,
                           UserPasswordResetService userPasswordResetService) {
+        this.userDetailsService = userDetailsService;
+        this.jwtHelper = jwtHelper;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.userPasswordResetService = userPasswordResetService;
@@ -63,11 +74,16 @@ public class AuthController {
      * @return A generic response with a message of "success"
      */
     @PostMapping("/login")
-    public ResponseEntity<ObjectNode> authenticateUser(@Validated(CustomGroupSequence.class) @RequestBody LoginDto loginDto) {
-        Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return ResponseEntity.ok(objectMapper.createObjectNode().put("message", "logged in"));
+    public ResponseEntity<JsonNode> authenticateUser(@Validated(CustomGroupSequence.class) @RequestBody LoginDto loginDto) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginDto.getUsername());
+
+        User user = userService.promoteToUser(userDetails);
+
+        Map<String, String> claims = new HashMap<>();
+        claims.put("username", user.getUsername());
+        claims.put("id", user.getId().toString());
+        String jwt = jwtHelper.createJwtForClaims(user.getUsername(), claims);
+        return ResponseEntity.ok().body(objectMapper.createObjectNode().put("token", jwt));
     }
 
     /**
@@ -135,9 +151,12 @@ public class AuthController {
      * @return JSON representation of the user
      */
     @GetMapping("user")
-    public ResponseEntity<User> getUserSettings() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return ResponseEntity.ok(user);
+    public ResponseEntity<User> getUserSettings(Authentication authentication) {
+        JwtAuthenticationToken token = (JwtAuthenticationToken) authentication;
+        Map<String, Object> attributes = token.getTokenAttributes();
+        UserDetails userDetails =
+                userDetailsService.loadUserByUsername(attributes.get("username").toString());
+        return ResponseEntity.ok(userService.promoteToUser(userDetails));
     }
 
     /**
