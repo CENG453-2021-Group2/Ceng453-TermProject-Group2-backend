@@ -17,6 +17,7 @@ import group2.monopoly.security.jwt.JwtHelper;
 import group2.monopoly.validation.CustomGroupSequence;
 import io.vavr.control.Either;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ import java.util.Optional;
  * It contains two endpoints, one for login and one for registration
  */
 @RestController
+@Slf4j
 @RequestMapping(value = "/api/auth", produces = "application/json", consumes = "application/json")
 public class AuthController {
 
@@ -119,18 +121,26 @@ public class AuthController {
      * @return JSON response notifying a password reset token is sent if such user exists.
      */
     @PostMapping("/forgotPassword")
-    public ResponseEntity<ObjectNode> forgotPassword(@RequestBody @NonNull String identifier) {
-        userPasswordResetService.generateNewToken(identifier);
-        return ResponseEntity.ok().body(objectMapper.createObjectNode().put("message", "password " +
-                                                                                       "reset " +
-                                                                                       "token " +
-                                                                                       "will be " +
-                                                                                       "sent to " +
-                                                                                       "your " +
-                                                                                       "email if " +
-                                                                                       "such " +
-                                                                                       "account " +
-                                                                                       "exists"));
+    public ResponseEntity<ObjectNode> forgotPassword(@RequestBody @NonNull JsonNode identifier) throws BasicAuthException {
+        JsonNode node = identifier.get("identifier");
+        if (node == null) {
+            throw new BasicAuthException("identifier can't be null");
+        }
+
+        String s = node.textValue();
+        if (s == null) {
+            throw new BasicAuthException("identifier should be a string");
+        }
+
+        if (userPasswordResetService.generateNewToken(s).isEmpty()) {
+            log.info("identifier:" + identifier + "not found");
+        }
+        return ResponseEntity
+                .ok()
+                .body(objectMapper.createObjectNode()
+                        .put("message",
+                                "password reset token will be sent to your email if such account " +
+                                "exists"));
     }
 
     /**

@@ -4,8 +4,9 @@ import group2.monopoly.auth.entity.User;
 import group2.monopoly.auth.entity.UserPasswordReset;
 import group2.monopoly.auth.repository.UserPasswordResetRepository;
 import group2.monopoly.auth.repository.UserRepository;
-import group2.monopoly.mail.EmailService;
+import group2.monopoly.mail.EmailServiceImpl;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,19 +22,20 @@ import java.util.UUID;
  * Service providing password reset features including token generation.
  */
 @Service
+@Slf4j
 public class UserPasswordResetService {
     private static final long MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
 
     final private UserRepository userRepository;
     final private UserPasswordResetRepository userPasswordResetRepository;
-    final private EmailService emailService;
+    final private EmailServiceImpl emailService;
     private final PasswordEncoder passwordEncoder;
 
 
     @Autowired
     public UserPasswordResetService(UserRepository userRepository,
                                     UserPasswordResetRepository userPasswordResetRepository,
-                                    EmailService emailService, PasswordEncoder passwordEncoder) {
+                                    EmailServiceImpl emailService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userPasswordResetRepository = userPasswordResetRepository;
         this.emailService = emailService;
@@ -59,8 +61,12 @@ public class UserPasswordResetService {
         userPasswordResetRepository.save(newToken);
 
         final String mailSubject = "Monopoly Password Reset Token";
+
+        log.info(user.getEmail() + "\n" + mailSubject + "\n" + newToken.getToken());
+
         emailService.sendSimpleMessage(user.getEmail(), mailSubject,
                 newToken.getToken().toString());
+        log.info("password reset email sent");
         return newToken;
     }
 
@@ -88,11 +94,15 @@ public class UserPasswordResetService {
      * @see #generateNewToken(User, Date, UUID)
      */
     public Optional<UserPasswordReset> generateNewToken(@NonNull @NotBlank String identifier) {
-        Optional<User> user = userRepository.findByUsername(identifier);
-        if (user.isPresent()) {
-            return user.map(this::generateNewToken);
+        log.info("trying to generate new token for user with identifier " + identifier);
+        Optional<User> userByUsername = userRepository.findByUsername(identifier);
+        if (userByUsername.isPresent()) {
+            log.info("found user by username " + userByUsername.orElseThrow());
+            return userByUsername.map(this::generateNewToken);
         }
-        return userRepository.findByEmail(identifier).map(this::generateNewToken);
+        Optional<User> userByEmail = userRepository.findByEmail(identifier);
+        userByEmail.ifPresent(u -> log.info("found user by username " + u));
+        return userByEmail.map(this::generateNewToken);
     }
 
     /**
