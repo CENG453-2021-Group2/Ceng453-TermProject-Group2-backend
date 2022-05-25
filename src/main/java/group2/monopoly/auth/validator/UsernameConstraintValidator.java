@@ -23,7 +23,9 @@ public class UsernameConstraintValidator implements ConstraintValidator<ValidUse
     @Override
     public boolean isValid(String username,
                            ConstraintValidatorContext constraintValidatorContext) {
-
+        if (username == null) {
+            return true;
+        }
         // 4-16 alphanumeric characters
         if (username.matches("\\w{4,16}+")) {
             return true;

@@ -21,9 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -53,7 +52,8 @@ public class AuthController {
     private final UserPasswordResetService userPasswordResetService;
 
     @Autowired
-    public AuthController(UserDetailsService userDetailsService, JwtHelper jwtHelper, AuthenticationManager authenticationManager, UserService userService,
+    public AuthController(UserDetailsService userDetailsService, JwtHelper jwtHelper,
+                          AuthenticationManager authenticationManager, UserService userService,
                           UserPasswordResetService userPasswordResetService) {
         this.userDetailsService = userDetailsService;
         this.jwtHelper = jwtHelper;
@@ -76,8 +76,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<JsonNode> authenticateUser(@Validated(CustomGroupSequence.class) @RequestBody LoginDto loginDto) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginDto.getUsername());
-
+        if (!userService.passwordMatches(userDetails, loginDto.getPassword())) {
+            throw new BadCredentialsException("invalid password");
+        }
         User user = userService.promoteToUser(userDetails);
+
 
         Map<String, String> claims = new HashMap<>();
         claims.put("username", user.getUsername());
@@ -119,7 +122,15 @@ public class AuthController {
     public ResponseEntity<ObjectNode> forgotPassword(@RequestBody @NonNull String identifier) {
         userPasswordResetService.generateNewToken(identifier);
         return ResponseEntity.ok().body(objectMapper.createObjectNode().put("message", "password " +
-                "reset token will be sent to your email if such account exists"));
+                                                                                       "reset " +
+                                                                                       "token " +
+                                                                                       "will be " +
+                                                                                       "sent to " +
+                                                                                       "your " +
+                                                                                       "email if " +
+                                                                                       "such " +
+                                                                                       "account " +
+                                                                                       "exists"));
     }
 
     /**
@@ -139,8 +150,8 @@ public class AuthController {
                 userPasswordResetService.resetPassword(passwordResetRequestDTO.getToken(),
                         passwordResetRequestDTO.getPassword());
         User user = optionalUser.orElseThrow(() -> new BasicAuthException("token either does not " +
-                "exist " +
-                "or is expired"));
+                                                                          "exist " +
+                                                                          "or is expired"));
         return ResponseEntity.ok().body(objectMapper.createObjectNode().put("message",
                 "password successfully changed for user " + user.getUsername()));
     }
@@ -151,7 +162,7 @@ public class AuthController {
      * @return JSON representation of the user
      */
     @GetMapping("user")
-    public ResponseEntity<User> getUserSettings(Authentication authentication) {
+    public ResponseEntity<Object> getUserSettings(Authentication authentication) {
         JwtAuthenticationToken token = (JwtAuthenticationToken) authentication;
         Map<String, Object> attributes = token.getTokenAttributes();
         UserDetails userDetails =
@@ -169,11 +180,16 @@ public class AuthController {
      * @return JSON representation of the user
      */
     @PostMapping("user")
-    public ResponseEntity<Object> postUserSettings(@Validated(CustomGroupSequence.class) @RequestBody UserSettingsChangeDTO dto) throws BasicAuthException {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<Object> postUserSettings(@Validated(CustomGroupSequence.class) @RequestBody UserSettingsChangeDTO dto, Authentication authentication) throws BasicAuthException {
+        JwtAuthenticationToken token = (JwtAuthenticationToken) authentication;
+        Map<String, Object> attributes = token.getTokenAttributes();
 
-        // Authentication
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword()));
+        UserDetails userDetails =
+                userDetailsService.loadUserByUsername(attributes.get("username").toString());
+        if (!userService.passwordMatches(userDetails, dto.getPassword())) {
+            throw new BadCredentialsException("invalid password");
+        }
+        User user = userService.promoteToUser(userDetails);
 
         // Password validation
         String newPassword = dto.getNewPassword();
@@ -182,7 +198,7 @@ public class AuthController {
         if (newPassword == null && confirmNewPassword == null || newPassword != null && newPassword.equals(confirmNewPassword)) {
             if (dto.getEmail() == null && dto.getNewPassword() == null && dto.getUsername() == null) {
                 throw new BasicAuthException("At least one of 'username', 'email', " +
-                        "'newPassword' fields should be provided.");
+                                             "'newPassword' fields should be provided.");
             }
             Either<String, User> eitherUser = userService.updateUser(user, dto);
             return ResponseEntity.ok(eitherUser.getOrElseThrow(BasicAuthException::new));

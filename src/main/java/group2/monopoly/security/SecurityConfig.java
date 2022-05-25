@@ -1,5 +1,6 @@
 package group2.monopoly.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 /**
  * It configures the security for the application
@@ -23,13 +25,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomUserDetailsService userDetailsService;
 
+    @Autowired
+    private JwtDecoder jwtDecoder;
+
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
     /**
      * The password encoder is a function that takes a password and returns a hash of that password
-     * 
+     *
      * @return A new instance of BCryptPasswordEncoder.
      */
     @Bean
@@ -45,22 +50,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
-                .antMatchers("/api/auth/user").authenticated() // user endpoint
-                .antMatchers("/api/auth/**").permitAll() // other auth endpoints
-                .anyRequest().authenticated() // remaining endpoints
-                .and()
+                .authorizeRequests(configurer -> configurer
+                        .antMatchers("/api/auth/user").authenticated() // user endpoint
+                        .antMatchers("/api/auth/**").permitAll() // other auth endpoints
+                        .anyRequest().authenticated() // remaining endpoints
+                )
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
     }
 
     /**
-     * "Configure the AuthenticationManagerBuilder with a UserDetailsService and a PasswordEncoder."
-     * 
+     * Configure the AuthenticationManagerBuilder with a UserDetailsService and a PasswordEncoder.
+     * <p>
      * The AuthenticationManagerBuilder is a helper class that allows easy creation of an
      * AuthenticationManager
-     * 
+     *
      * @param auth AuthenticationManagerBuilder is used to create an AuthenticationManager instance
-     * which is the main Spring Security interface for authenticating a user.
+     *             which is the main Spring Security interface for authenticating a user.
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -70,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * The `authenticationManagerBean()` function is used to expose the `AuthenticationManager` as a
      * Bean
-     * 
+     *
      * @return AuthenticationManager
      */
     @Override
@@ -78,4 +83,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
 }

@@ -7,6 +7,7 @@ import group2.monopoly.mapper.ObjectMapperSingleton;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -23,7 +24,7 @@ public class AuthExceptionHandler {
     public static ObjectMapper mapper = ObjectMapperSingleton.getMapper();
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler({BadCredentialsException.class})
+    @ExceptionHandler({AuthenticationException.class})
     public ResponseEntity<JsonNode> handleAccessDeniedException(Exception exception,
                                                                 WebRequest webRequest) {
         JsonNode response = mapper.createObjectNode().put("message", exception.getMessage());
