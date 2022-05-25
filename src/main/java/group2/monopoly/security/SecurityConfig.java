@@ -51,6 +51,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests(configurer -> configurer
+                        .antMatchers("/api/auth/forgotPassword").permitAll()
+                        .antMatchers("/api/auth/resetPassword").permitAll()
                         .antMatchers("/api/auth/user").authenticated() // user endpoint
                         .antMatchers("/api/auth/**").permitAll() // other auth endpoints
                         .anyRequest().authenticated() // remaining endpoints

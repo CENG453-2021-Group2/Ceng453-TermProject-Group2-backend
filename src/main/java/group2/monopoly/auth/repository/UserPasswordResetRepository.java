@@ -4,6 +4,7 @@ import group2.monopoly.auth.entity.User;
 import group2.monopoly.auth.entity.UserPasswordReset;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,5 +17,6 @@ public interface UserPasswordResetRepository extends JpaRepository<UserPasswordR
 
     Optional<UserPasswordReset> findUserPasswordResetByTokenEquals(@NonNull UUID token);
 
+    @Transactional
     void deleteAllByUser(User user);
 }

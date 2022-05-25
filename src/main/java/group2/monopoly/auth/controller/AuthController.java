@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * It contains two endpoints, one for login and one for registration
@@ -157,7 +158,7 @@ public class AuthController {
     @PostMapping("/resetPassword")
     public ResponseEntity<JsonNode> resetPassword(@Validated(CustomGroupSequence.class) @RequestBody PasswordResetRequestDTO passwordResetRequestDTO) throws BasicAuthException {
         Optional<User> optionalUser =
-                userPasswordResetService.resetPassword(passwordResetRequestDTO.getToken(),
+                userPasswordResetService.resetPassword(UUID.fromString(passwordResetRequestDTO.getToken()),
                         passwordResetRequestDTO.getPassword());
         User user = optionalUser.orElseThrow(() -> new BasicAuthException("token either does not " +
                                                                           "exist " +
