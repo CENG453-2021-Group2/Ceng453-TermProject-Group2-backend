@@ -14,7 +14,7 @@ public class EmailServiceImpl implements EmailService {
     private static final String NO_REPLY_ADDRESS = "no-reply@koluacik.xyz";
 
     @Autowired
-    private JavaMailSender mailSender; // = new JavaMailSenderImpl();
+    private JavaMailSender mailSender;
 
 
     @Override

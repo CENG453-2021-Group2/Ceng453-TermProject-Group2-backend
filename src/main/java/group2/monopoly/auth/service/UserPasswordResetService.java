@@ -4,7 +4,7 @@ import group2.monopoly.auth.entity.User;
 import group2.monopoly.auth.entity.UserPasswordReset;
 import group2.monopoly.auth.repository.UserPasswordResetRepository;
 import group2.monopoly.auth.repository.UserRepository;
-import group2.monopoly.mail.EmailServiceImpl;
+import group2.monopoly.mail.EmailService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +28,14 @@ public class UserPasswordResetService {
 
     final private UserRepository userRepository;
     final private UserPasswordResetRepository userPasswordResetRepository;
-    final private EmailServiceImpl emailService;
+    final private EmailService emailService;
     private final PasswordEncoder passwordEncoder;
 
 
     @Autowired
     public UserPasswordResetService(UserRepository userRepository,
                                     UserPasswordResetRepository userPasswordResetRepository,
-                                    EmailServiceImpl emailService, PasswordEncoder passwordEncoder) {
+                                    EmailService emailService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userPasswordResetRepository = userPasswordResetRepository;
         this.emailService = emailService;

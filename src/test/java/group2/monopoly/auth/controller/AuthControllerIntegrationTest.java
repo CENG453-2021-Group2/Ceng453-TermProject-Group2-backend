@@ -80,12 +80,8 @@ public class AuthControllerIntegrationTest {
 
     @BeforeEach
     void setup() {
-//        this.mvc = webAppContextSetup(wac).apply(springSecurity()).build();
         this.mvc = MockMvcBuilders.webAppContextSetup(wac)
-//                .standaloneSetup(authController)
                 .apply(springSecurity())
-//                .setControllerAdvice(new AuthExceptionHandler(),
-//                        new RestResponseEntityExceptionHandler())
                 .build();
         resetRepository.deleteAll();
         resetRepository.flush();
