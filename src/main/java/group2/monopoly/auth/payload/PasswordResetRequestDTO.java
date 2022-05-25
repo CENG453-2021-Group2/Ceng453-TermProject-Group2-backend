@@ -16,7 +16,7 @@ import java.util.UUID;
 public class PasswordResetRequestDTO {
     @NotNull
     @ValidUuid
-    private UUID token;
+    private String token;
 
     @NotNull
     @ValidPassword
