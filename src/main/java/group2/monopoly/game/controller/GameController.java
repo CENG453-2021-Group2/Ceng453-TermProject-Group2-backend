@@ -58,12 +58,18 @@ public class GameController {
     }
 
 
+    @GetMapping("/")
+    public List<Game> getAvailableGames(Authentication authentication) {
+        User user = userService.promoteToUser((UserDetails) authentication);
+        return gameManager.getAvailableGames(user);
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/")
-    public ResponseEntity<ObjectNode> createGame(@RequestBody GameCreateDTO dto,
+    public Game createGame(@RequestBody GameCreateDTO dto,
                                                  Authentication authentication) {
         User user = userService.promoteToUser((UserDetails) authentication);
-        Game game = gameManager.createGame(user, dto.getName());
-        return ResponseEntity.status(HttpStatus.CREATED).body(objectMapper.createObjectNode().put("id", game.getId()));
+        return gameManager.createGame(user, dto.getName());
     }
 
     @GetMapping("/{id}")
