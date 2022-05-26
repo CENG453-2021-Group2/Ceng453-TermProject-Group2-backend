@@ -192,15 +192,10 @@ public class AuthController {
      */
     @PostMapping("user")
     public ResponseEntity<Object> postUserSettings(@Validated(CustomGroupSequence.class) @RequestBody UserSettingsChangeDTO dto, Authentication authentication) throws BasicAuthException {
-        JwtAuthenticationToken token = (JwtAuthenticationToken) authentication;
-        Map<String, Object> attributes = token.getTokenAttributes();
-
-        UserDetails userDetails =
-                userDetailsService.loadUserByUsername(attributes.get("username").toString());
-        if (!userService.passwordMatches(userDetails, dto.getPassword())) {
+        User user = userService.promoteToUser((JwtAuthenticationToken) authentication);
+        if (!userService.passwordMatches(user, dto.getPassword())) {
             throw new BadCredentialsException("invalid password");
         }
-        User user = userService.promoteToUser(userDetails);
 
         // Password validation
         String newPassword = dto.getNewPassword();
