@@ -8,6 +8,7 @@ import group2.monopoly.game.exception.GameManagementException;
 import group2.monopoly.game.exception.GameOverException;
 import group2.monopoly.game.repository.GameRepository;
 import group2.monopoly.game.repository.PlayerRepository;
+import group2.monopoly.game.service.AiPlayerRunner.IAiPlayerRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ public class GameEngineService implements IGameEngine {
     private final PlayerRepository playerRepository;
     private final GameRepository gameRepository;
 
+    private final IAiPlayerRunner robot;
+
     private final IGameCellPrice priceService;
 
     private final IDiceGenerator diceService;
@@ -34,9 +37,11 @@ public class GameEngineService implements IGameEngine {
 
     @Autowired
     public GameEngineService(PlayerRepository playerRepository, GameRepository gameRepository,
-                             GameCellPriceService priceService, IDiceGenerator diceService) {
+                             IAiPlayerRunner robot, GameCellPriceService priceService,
+                             IDiceGenerator diceService) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
+        this.robot = robot;
         this.priceService = priceService;
         this.diceService = diceService;
     }
@@ -44,9 +49,9 @@ public class GameEngineService implements IGameEngine {
     public void step(Boolean buyCurrentCell, Player player) throws GameManagementException,
             GameOverException, GameFaultyMoveException {
         // Handle jail time
-        while (player.getRemainingJailTime() > 0) {
+        if (player.getRemainingJailTime() > 0) {
             player.setRemainingJailTime(player.getRemainingJailTime() - 1);
-            handleAI();
+            return;
         }
 
         Game game = player.getGame();
@@ -90,8 +95,6 @@ public class GameEngineService implements IGameEngine {
 
         if (location.equals(startingPointCell)) {
             payPlayer(player, priceService.getSalary());
-        } else if (location.equals(jailCell)) {
-            ;
         } else if (location.equals(goToJailCell)) {
             handleGoToJail(player);
         }
@@ -104,10 +107,7 @@ public class GameEngineService implements IGameEngine {
             } else {
                 handlePropertyCell(player, game, propertyIndices, playerOwnedPurchasables);
             }
-        } else {
         }
-
-
     }
 
     private void defaultCheck(Player player, Game game) throws GameOverException {
@@ -122,10 +122,12 @@ public class GameEngineService implements IGameEngine {
 
     private void payPlayer(Player player, Integer amount) {
         player.setMoney(player.getMoney() + amount);
+        playerRepository.save(player);
     }
 
     private void chargePlayer(Player player, Game game, Integer cost) throws GameOverException {
         player.setMoney(player.getMoney() - cost);
+        playerRepository.save(player);
         defaultCheck(player, game);
     }
 
@@ -202,9 +204,4 @@ public class GameEngineService implements IGameEngine {
         return player.getMoney() >= priceService.getCellPrice(game.getGameTableConfiguration(),
                 location);
     }
-
-    private void handleAI() {
-    }
-
-    ;
 }
