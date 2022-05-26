@@ -35,7 +35,7 @@ public class GameManagerService {
         table.setIncomeTaxIndex(sequence.getIncomeTax());
     }
 
-    public void createGame(@NotNull User user, @NotNull String name) {
+    public Game createGame(@NotNull User user, @NotNull String name) {
         CellSequence cellSequence = cellSequenceGenerator.generateCellSequence();
 
         GameTableConfiguration table = new GameTableConfiguration();
@@ -63,6 +63,7 @@ public class GameManagerService {
                 .build();
         playerRepository.save(player);
         playerRepository.save(computer);
+        return game;
     }
 
     public void deleteGame(@NotNull User user, @NotNull Game game) throws GameManagementException {
