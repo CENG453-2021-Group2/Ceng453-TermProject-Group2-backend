@@ -1,5 +1,6 @@
 package group2.monopoly.game.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import group2.monopoly.auth.entity.User;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -52,6 +53,7 @@ public class Player {
     @Column(name = "turn_order", nullable = false)
     private Integer turnOrder;
 
+    @Builder.Default
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Integer> ownedPurchasables = new HashSet<>();
 
@@ -59,8 +61,9 @@ public class Player {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "game_id")
+    @JsonIgnore
     private Game game;
 
     @Override

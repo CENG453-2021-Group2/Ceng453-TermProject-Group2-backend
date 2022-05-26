@@ -6,6 +6,7 @@ import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -28,8 +29,10 @@ public class Game {
     @JoinColumn(name = "owner")
     private User owner;
 
-    @OneToMany(mappedBy = "game")
-    private List<Player> players;
+    @Builder.Default
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Player> players = new ArrayList<>();
 
     @NonNull
     @NotBlank
