@@ -4,7 +4,6 @@ import group2.monopoly.game.entity.Game;
 import group2.monopoly.game.entity.GameTableConfiguration;
 import group2.monopoly.game.entity.Player;
 import group2.monopoly.game.exception.GameFaultyMoveException;
-import group2.monopoly.game.exception.GameManagementException;
 import group2.monopoly.game.exception.GameOverException;
 import group2.monopoly.game.repository.GameRepository;
 import group2.monopoly.game.repository.PlayerRepository;
@@ -13,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -22,8 +22,6 @@ import java.util.stream.Stream;
 public class GameEngineService implements IGameEngine {
     private final PlayerRepository playerRepository;
     private final GameRepository gameRepository;
-
-    private final IAiPlayerRunner robot;
 
     private final IGameCellPrice priceService;
 
@@ -37,18 +35,15 @@ public class GameEngineService implements IGameEngine {
 
     @Autowired
     public GameEngineService(PlayerRepository playerRepository, GameRepository gameRepository,
-                             IAiPlayerRunner robot, GameCellPriceService priceService,
+                             GameCellPriceService priceService,
                              IDiceGenerator diceService) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
-        this.robot = robot;
         this.priceService = priceService;
         this.diceService = diceService;
     }
 
-    public void step(Boolean buyCurrentCell, Player player) throws GameManagementException,
-            GameOverException, GameFaultyMoveException {
-        // Handle jail time
+    public void moveStep(Player player) throws GameOverException {
         if (player.getRemainingJailTime() > 0) {
             player.setRemainingJailTime(player.getRemainingJailTime() - 1);
             return;
@@ -56,17 +51,6 @@ public class GameEngineService implements IGameEngine {
 
         Game game = player.getGame();
         List<Player> players = game.getPlayers();
-
-        if (buyCurrentCell) {
-            if (canBuy(player, game, player.getLocation())) {
-                player.getOwnedPurchasables().add(player.getLocation());
-                chargePlayer(player, game,
-                        priceService.getCellPrice(game.getGameTableConfiguration(),
-                                player.getLocation()));
-            } else {
-                throw new GameFaultyMoveException("can not buy cell");
-            }
-        }
 
         List<Integer> roll = diceService.roll();
 
@@ -87,7 +71,6 @@ public class GameEngineService implements IGameEngine {
         Set<Integer> playerOwnedPurchasables = player.getOwnedPurchasables();
 
         GameTableConfiguration table = game.getGameTableConfiguration();
-        List<Integer> propertyIndices = table.getPropertyIndices();
         List<Integer> portIndices = table.getPortIndices();
         Integer incomeTaxIndex = table.getIncomeTaxIndex();
 
@@ -105,13 +88,30 @@ public class GameEngineService implements IGameEngine {
             if (portIndices.contains(location)) {
                 handlePortCell(player, game, portIndices, playerOwnedPurchasables);
             } else {
-                handlePropertyCell(player, game, propertyIndices, playerOwnedPurchasables);
+                handlePropertyCell(player, game, playerOwnedPurchasables);
             }
+        }
+        playerRepository.save(player);
+    }
+
+    public void purchaseStep(Player player) throws GameOverException,
+            GameFaultyMoveException {
+        Game game = player.getGame();
+
+        if (canBuy(player, game, player.getLocation())) {
+            player.getOwnedPurchasables().add(player.getLocation());
+            chargePlayer(player, game,
+                    priceService.getCellPrice(game.getGameTableConfiguration(),
+                            player.getLocation()));
+        } else {
+            throw new GameFaultyMoveException("can not buy cell");
         }
     }
 
     private void defaultCheck(Player player, Game game) throws GameOverException {
         if (player.getMoney() < 0) {
+            game.setCompletionDate(new Date());
+            gameRepository.save(game);
             throw new GameOverException(player, game);
         }
     }
@@ -165,7 +165,6 @@ public class GameEngineService implements IGameEngine {
 
     private void handlePropertyCell(Player player,
                                     Game game,
-                                    List<Integer> propertyIndices,
                                     Set<Integer> playerOwnedPurchasables) throws GameOverException {
         Integer location = player.getLocation();
         if (!playerOwnedPurchasables.contains(location)) {
@@ -189,10 +188,11 @@ public class GameEngineService implements IGameEngine {
         chargePlayer(player, game, priceService.getIncomeTax());
     }
 
-    private void handleGoToJail(Player player) throws GameOverException {
+    private void handleGoToJail(Player player) {
         player.setLocation(jailCell);
         player.setRemainingJailTime(jailDuration);
         player.setSuccessiveDoubles(0);
+        playerRepository.save(player);
     }
 
     private boolean canBuy(Player player, Game game, Integer location) {
