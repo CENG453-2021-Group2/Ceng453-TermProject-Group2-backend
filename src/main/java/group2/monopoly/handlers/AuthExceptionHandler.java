@@ -43,5 +43,4 @@ public class AuthExceptionHandler {
         log.debug("handling exception with response " + response.toString());
         return ResponseEntity.badRequest().body(response);
     }
-
 }

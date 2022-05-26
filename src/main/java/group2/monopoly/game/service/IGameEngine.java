@@ -13,4 +13,6 @@ public interface IGameEngine {
 
     boolean canBuy(Player player, Game game, Integer location);
 
+    void nukeGame(Player player, Game game) throws GameOverException;
+
 }

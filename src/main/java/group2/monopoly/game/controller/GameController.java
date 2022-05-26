@@ -24,6 +24,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * It contains two endpoints, one for login and one for registration
@@ -120,5 +121,15 @@ public class GameController {
 
         return game;
     }
+
+    @PostMapping("/{id}/nuke")
+    public Game nukeGame(@PathVariable("id") Long id, Authentication authentication,
+                         @RequestBody Map<String, Integer> params) throws GameManagementException, GameOverException {
+        User user = userService.promoteToUser((JwtAuthenticationToken) authentication);
+        Game game = gameManager.getGame(user, id);
+        gameEngine.nukeGame(game.getPlayers().get(params.get("id") - 1), game);
+        return game;
+    }
+
 }
 

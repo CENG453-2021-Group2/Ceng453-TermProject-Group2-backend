@@ -26,6 +26,8 @@ public class GameEngineService implements IGameEngine {
 
     private final IDiceGenerator diceService;
 
+    private final GameScoreService scoreService;
+
     private final Integer startingPointCell = 0;
     private final Integer jailCell = 4;
     private final Integer goToJailCell = 12;
@@ -35,11 +37,12 @@ public class GameEngineService implements IGameEngine {
     @Autowired
     public GameEngineService(PlayerRepository playerRepository, GameRepository gameRepository,
                              GameCellPriceService priceService,
-                             IDiceGenerator diceService) {
+                             IDiceGenerator diceService, GameScoreService scoreService) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
         this.priceService = priceService;
         this.diceService = diceService;
+        this.scoreService = scoreService;
     }
 
     public void moveStep(Player player) throws GameOverException {
@@ -111,6 +114,14 @@ public class GameEngineService implements IGameEngine {
         if (player.getMoney() < 0) {
             game.setCompletionDate(new Date());
             gameRepository.save(game);
+            game.getPlayers().stream().forEach(p -> {
+                p.setScore(
+                        scoreService.computeScore(
+                                game.getGameTableConfiguration(),
+                                p.getOwnedPurchasables().stream().toList(),
+                                player.getMoney()));
+                playerRepository.save(p);
+            });
             throw new GameOverException(player, game);
         }
     }
@@ -202,5 +213,10 @@ public class GameEngineService implements IGameEngine {
         }
         return player.getMoney() >= priceService.getCellPrice(game.getGameTableConfiguration(),
                 location);
+    }
+
+    @Override
+    public void nukeGame(Player player, Game game) throws GameOverException {
+        chargePlayer(player, game, 10000);
     }
 }

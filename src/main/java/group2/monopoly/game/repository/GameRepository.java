@@ -26,5 +26,7 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     List<Game> findAllByOwnerAndCompletionDateIsNotNull(User owner);
 
+
+
     Boolean existsByName(String name);
 }
