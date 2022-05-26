@@ -15,7 +15,7 @@ public class GameCellPriceService implements IGameCellPrice {
 
     @Override
     public Integer getPortPrice(GameTableConfiguration table, Integer tableIndex) {
-        if (table.getPropertyIndices().contains(tableIndex)) {
+        if (table.getPortIndices().contains(tableIndex)) {
             return 250;
         }
         throw new IllegalArgumentException("given cell is not a port");

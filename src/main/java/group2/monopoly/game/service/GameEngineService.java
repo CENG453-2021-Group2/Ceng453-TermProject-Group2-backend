@@ -7,7 +7,6 @@ import group2.monopoly.game.exception.GameFaultyMoveException;
 import group2.monopoly.game.exception.GameOverException;
 import group2.monopoly.game.repository.GameRepository;
 import group2.monopoly.game.repository.PlayerRepository;
-import group2.monopoly.game.service.AiPlayerRunner.IAiPlayerRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -172,11 +171,11 @@ public class GameEngineService implements IGameEngine {
             Integer propertyRent = priceService.getPropertyRent(game.getGameTableConfiguration(),
                     location);
             chargePlayer(player, game, propertyRent);
-            log.info("charged user " + player.getUser().getUsername() + " " + propertyRent);
+            log.info("charged player " + player.getId() + " " + propertyRent);
             for (Player p : game.getPlayers()) {
                 if (p.getOwnedPurchasables().contains(location)) {
                     payPlayer(p, propertyRent);
-                    log.info("paid user " + p.getUser().getUsername() + " " + propertyRent);
+                    log.info("paid player " + p.getId() + " " + propertyRent);
                 }
             }
         } else {
@@ -195,7 +194,7 @@ public class GameEngineService implements IGameEngine {
         playerRepository.save(player);
     }
 
-    private boolean canBuy(Player player, Game game, Integer location) {
+    public boolean canBuy(Player player, Game game, Integer location) {
         if (Set.of(startingPointCell, goToJailCell, jailCell).contains(location)) {
             return false;
         } else if (getPurchases(game.getPlayers()).toList().contains(location)) {

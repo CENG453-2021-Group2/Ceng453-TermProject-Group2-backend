@@ -3,6 +3,7 @@ package group2.monopoly.handlers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import group2.monopoly.auth.exception.BasicAuthException;
+import group2.monopoly.game.exception.GameManagementException;
 import group2.monopoly.mapper.ObjectMapperSingleton;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,8 +36,8 @@ public class AuthExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({BasicAuthException.class})
-    public ResponseEntity<JsonNode> handleBasicAuthException(BasicAuthException exception,
+    @ExceptionHandler({BasicAuthException.class, GameManagementException.class})
+    public ResponseEntity<JsonNode> handleBasicAuthException(Exception exception,
                                                              WebRequest webRequest) {
         JsonNode response = mapper.createObjectNode().put("message", exception.getMessage());
         log.debug("handling exception with response " + response.toString());

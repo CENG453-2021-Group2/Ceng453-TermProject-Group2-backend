@@ -7,6 +7,7 @@ import group2.monopoly.game.entity.Player;
 import group2.monopoly.game.exception.GameManagementException;
 import group2.monopoly.game.repository.GameRepository;
 import group2.monopoly.game.repository.PlayerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -17,12 +18,16 @@ import java.util.Optional;
 @Service
 public class GameManagerService {
     private final ICellSequenceGenerator cellSequenceGenerator;
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
 
-    private PlayerRepository playerRepository;
+    private final PlayerRepository playerRepository;
 
-    public GameManagerService(ICellSequenceGenerator cellSequenceGenerator) {
+    @Autowired
+    public GameManagerService(ICellSequenceGenerator cellSequenceGenerator,
+                              GameRepository gameRepository, PlayerRepository playerRepository) {
         this.cellSequenceGenerator = cellSequenceGenerator;
+        this.gameRepository = gameRepository;
+        this.playerRepository = playerRepository;
     }
 
     private void populateIndexes(GameTableConfiguration table, CellSequence sequence) {
@@ -35,8 +40,11 @@ public class GameManagerService {
         table.setIncomeTaxIndex(sequence.getIncomeTax());
     }
 
-    public Game createGame(@NotNull User user, @NotNull String name) {
+    public Game createGame(@NotNull User user, @NotNull String name) throws GameManagementException {
         CellSequence cellSequence = cellSequenceGenerator.generateCellSequence();
+        if (gameRepository.existsByName(name)) {
+            throw new GameManagementException("game with name " + name + " exists");
+        }
 
         GameTableConfiguration table = new GameTableConfiguration();
         populateIndexes(table, cellSequence);
@@ -46,7 +54,6 @@ public class GameManagerService {
                 .name(name)
                 .gameTableConfiguration(table)
                 .build();
-        gameRepository.save(game);
         Player player = Player
                 .builder()
                 .game(game)
@@ -61,8 +68,9 @@ public class GameManagerService {
                 .money(1500)
                 .turnOrder(1)
                 .build();
-        playerRepository.save(player);
-        playerRepository.save(computer);
+        game.getPlayers().add(player);
+        game.getPlayers().add(computer);
+        gameRepository.save(game);
         return game;
     }
 
@@ -72,7 +80,6 @@ public class GameManagerService {
         } else if (game.getCompletionDate() != null) {
             throw new GameManagementException("can not delete already completed games");
         }
-        playerRepository.deleteAllByGame(game);
         gameRepository.delete(game);
     }
 

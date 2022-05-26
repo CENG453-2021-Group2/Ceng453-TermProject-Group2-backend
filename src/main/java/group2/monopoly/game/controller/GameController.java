@@ -2,7 +2,6 @@ package group2.monopoly.game.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import group2.monopoly.auth.entity.User;
 import group2.monopoly.auth.service.UserService;
 import group2.monopoly.game.entity.Game;
@@ -20,9 +19,8 @@ import group2.monopoly.mapper.ObjectMapperSingleton;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,30 +56,30 @@ public class GameController {
     }
 
 
-    @GetMapping("/")
+    @GetMapping("")
     public List<Game> getAvailableGames(Authentication authentication) {
-        User user = userService.promoteToUser((UserDetails) authentication);
+        User user = userService.promoteToUser((JwtAuthenticationToken) authentication);
         return gameManager.getAvailableGames(user);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/")
+    @PostMapping("")
     public Game createGame(@RequestBody GameCreateDTO dto,
-                                                 Authentication authentication) {
-        User user = userService.promoteToUser((UserDetails) authentication);
+                           Authentication authentication) throws GameManagementException {
+        User user = userService.promoteToUser((JwtAuthenticationToken) authentication);
         return gameManager.createGame(user, dto.getName());
     }
 
     @GetMapping("/{id}")
     public Game getGame(@PathVariable("id") Long id, Authentication authentication) throws GameManagementException {
-        User user = userService.promoteToUser((UserDetails) authentication);
+        User user = userService.promoteToUser((JwtAuthenticationToken) authentication);
         return gameManager.getGame(user, id);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void deleteGame(@PathVariable("id") Long id, Authentication authentication) throws GameManagementException {
-        User user = userService.promoteToUser((UserDetails) authentication);
+        User user = userService.promoteToUser((JwtAuthenticationToken) authentication);
         gameManager.deleteGame(user, gameManager.getGame(user, id));
     }
 
@@ -89,7 +87,7 @@ public class GameController {
     public Game interactWithGame(@PathVariable("id") Long id, @RequestBody GameInteractionDTO dto
             , Authentication authentication) throws GameManagementException,
             GameFaultyMoveException, GameOverException {
-        User user = userService.promoteToUser((UserDetails) authentication);
+        User user = userService.promoteToUser((JwtAuthenticationToken) authentication);
         Game game = gameManager.getGame(user, id);
         List<Player> players = game.getPlayers();
 
@@ -106,13 +104,16 @@ public class GameController {
 
         if (dto.getBuy()) {
             gameEngine.purchaseStep(player);
-
-            gameEngine.moveStep(robot);
         }
-        Integer cellPrice = cellPriceService.getCellPrice(game.getGameTableConfiguration(),
-                robot.getLocation());
-        if (aiPlayerRunner.decideToBuy(robot.getMoney(), cellPrice)) {
-            gameEngine.purchaseStep(robot);
+
+        gameEngine.moveStep(robot);
+
+        if (gameEngine.canBuy(robot, game, robot.getLocation())) {
+            Integer cellPrice = cellPriceService.getCellPrice(game.getGameTableConfiguration(),
+                    robot.getLocation());
+            if (aiPlayerRunner.decideToBuy(robot.getMoney(), cellPrice)) {
+                gameEngine.purchaseStep(robot);
+            }
         }
 
         gameEngine.moveStep(player);
