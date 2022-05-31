@@ -6,9 +6,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -56,6 +54,10 @@ public class Player {
     @Builder.Default
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Integer> ownedPurchasables = new HashSet<>();
+
+    @Builder.Default
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Integer> lastDice = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id")

@@ -60,12 +60,14 @@ public class GameEngineService implements IGameEngine {
         List<Player> players = game.getPlayers();
 
         List<Integer> roll = diceService.roll();
+        player.setLastDice(roll);
 
         // Handle double dice
         if (roll.get(0).equals(roll.get(1))) {
             player.setSuccessiveDoubles(player.getSuccessiveDoubles() + 1);
             if (player.getSuccessiveDoubles().equals(3)) {
                 handleGoToJail(player);
+                return;
             }
         } else {
             player.setSuccessiveDoubles(0);
