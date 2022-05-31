@@ -169,9 +169,9 @@ public class GameEngineService implements IGameEngine {
                             player.getLocation()
                             , count);
                     chargePlayer(player, game, portRent);
-                    log.info("charged user " + player.getUser().getUsername() + " " + portRent);
+                    log.info("charged player " + player.getId() + " " + portRent);
                     payPlayer(p, portRent);
-                    log.info("paid user " + p.getUser().getUsername() + " " + portRent);
+                    log.info("paid player " + p.getId() + " " + portRent);
                     playerRepository.save(p);
                     break;
                 }
