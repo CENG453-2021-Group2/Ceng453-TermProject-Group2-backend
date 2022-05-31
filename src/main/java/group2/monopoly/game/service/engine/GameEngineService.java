@@ -121,7 +121,7 @@ public class GameEngineService implements IGameEngine {
         if (player.getMoney() < 0) {
             game.setCompletionDate(new Date());
             gameRepository.save(game);
-            game.getPlayers().stream().forEach(p -> {
+            game.getPlayers().forEach(p -> {
                 p.setScore(
                         scoreService.computeScore(
                                 game.getGameTableConfiguration(),
