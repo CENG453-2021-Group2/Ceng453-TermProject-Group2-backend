@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Service
-public class DiceGeneratorService implements IDiceGenerator {
+@Service(value = "randomDiceGenerator")
+public class RandomDiceGeneratorService implements IDiceGenerator {
 
     @Override
     public List<Integer> roll() {

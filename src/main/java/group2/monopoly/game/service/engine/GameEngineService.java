@@ -10,6 +10,7 @@ import group2.monopoly.game.repository.PlayerRepository;
 import group2.monopoly.game.service.GameScoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -29,16 +30,19 @@ public class GameEngineService implements IGameEngine {
 
     private final GameScoreService scoreService;
 
-    private final Integer startingPointCell = 0;
-    private final Integer jailCell = 4;
-    private final Integer goToJailCell = 12;
-
-    private final Integer jailDuration = 2;
+    private static final Integer STARTING_POINT_CELL = 0;
+    private static final Integer JAIL_CELL = 4;
+    private static final Integer GOTO_JAIL_CELL = 12;
+    private static final Integer JAIL_DURATION = 2;
+    private static final Integer TABLE_SIZE = 16;
 
     @Autowired
-    public GameEngineService(PlayerRepository playerRepository, GameRepository gameRepository,
+    public GameEngineService(PlayerRepository playerRepository,
+                             GameRepository gameRepository,
                              GameCellPriceService priceService,
-                             IDiceGenerator diceService, GameScoreService scoreService) {
+                             @Qualifier("fileDiceGenerator")
+                                 IDiceGenerator diceService,
+                             GameScoreService scoreService) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
         this.priceService = priceService;
@@ -68,7 +72,7 @@ public class GameEngineService implements IGameEngine {
         }
 
         Integer advance = roll.stream().reduce(0, Integer::sum);
-        player.setLocation((player.getLocation() + advance) % 16);
+        player.setLocation((player.getLocation() + advance) % TABLE_SIZE);
 
         Stream<Integer> ownedPurchasables = getPurchases(players);
         Set<Integer> playerOwnedPurchasables = player.getOwnedPurchasables();
@@ -79,9 +83,9 @@ public class GameEngineService implements IGameEngine {
 
         Integer location = player.getLocation();
 
-        if (location.equals(startingPointCell)) {
+        if (location.equals(STARTING_POINT_CELL)) {
             payPlayer(player, priceService.getSalary());
-        } else if (location.equals(goToJailCell)) {
+        } else if (location.equals(GOTO_JAIL_CELL)) {
             handleGoToJail(player);
         }
         if (location.equals(incomeTaxIndex)) {
@@ -200,14 +204,14 @@ public class GameEngineService implements IGameEngine {
     }
 
     private void handleGoToJail(Player player) {
-        player.setLocation(jailCell);
-        player.setRemainingJailTime(jailDuration);
+        player.setLocation(JAIL_CELL);
+        player.setRemainingJailTime(JAIL_DURATION);
         player.setSuccessiveDoubles(0);
         playerRepository.save(player);
     }
 
     public boolean canBuy(Player player, Game game, Integer location) {
-        if (Set.of(startingPointCell, goToJailCell, jailCell).contains(location)) {
+        if (Set.of(STARTING_POINT_CELL, GOTO_JAIL_CELL, JAIL_CELL).contains(location)) {
             return false;
         } else if (getPurchases(game.getPlayers()).toList().contains(location)) {
             return false;
