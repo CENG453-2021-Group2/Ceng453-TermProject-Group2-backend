@@ -1,7 +1,6 @@
-package group2.monopoly.game.service;
+package group2.monopoly.game.service.engine;
 
 import java.util.List;
-import java.util.Set;
 
 public interface IDiceGenerator {
     List<Integer> roll();

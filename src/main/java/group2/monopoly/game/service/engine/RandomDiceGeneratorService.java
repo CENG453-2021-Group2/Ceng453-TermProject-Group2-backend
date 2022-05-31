@@ -1,4 +1,4 @@
-package group2.monopoly.game.service;
+package group2.monopoly.game.service.engine;
 
 import org.springframework.stereotype.Service;
 

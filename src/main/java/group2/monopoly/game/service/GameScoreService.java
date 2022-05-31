@@ -1,6 +1,7 @@
 package group2.monopoly.game.service;
 
 import group2.monopoly.game.entity.GameTableConfiguration;
+import group2.monopoly.game.service.engine.IGameCellPrice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package group2.monopoly.game.service;
+package group2.monopoly.game.service.engine;
 
 import group2.monopoly.game.entity.Game;
 import group2.monopoly.game.entity.GameTableConfiguration;
@@ -7,6 +7,7 @@ import group2.monopoly.game.exception.GameFaultyMoveException;
 import group2.monopoly.game.exception.GameOverException;
 import group2.monopoly.game.repository.GameRepository;
 import group2.monopoly.game.repository.PlayerRepository;
+import group2.monopoly.game.service.GameScoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

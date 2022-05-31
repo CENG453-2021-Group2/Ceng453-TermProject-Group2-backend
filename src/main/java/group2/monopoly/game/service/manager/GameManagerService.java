@@ -1,4 +1,4 @@
-package group2.monopoly.game.service;
+package group2.monopoly.game.service.manager;
 
 import group2.monopoly.auth.entity.User;
 import group2.monopoly.game.entity.Game;
