@@ -52,7 +52,10 @@ public class GameEngineService implements IGameEngine {
 
     public void moveStep(Player player) throws GameOverException {
         if (player.getRemainingJailTime() > 0) {
+            log.info("player " + player.getId() + " in jail with remaining time " + player.getRemainingJailTime());
             player.setRemainingJailTime(player.getRemainingJailTime() - 1);
+            playerRepository.save(player);
+            log.info("after this turn " + player.getRemainingJailTime() + " turns left.");
             return;
         }
 
@@ -66,6 +69,7 @@ public class GameEngineService implements IGameEngine {
         if (roll.get(0).equals(roll.get(1))) {
             player.setSuccessiveDoubles(player.getSuccessiveDoubles() + 1);
             if (player.getSuccessiveDoubles().equals(3)) {
+                log.info("player " + player.getId() + " goes to jail for rolling three consecutive doubles.");
                 handleGoToJail(player);
                 return;
             }
@@ -88,6 +92,7 @@ public class GameEngineService implements IGameEngine {
         if (location.equals(STARTING_POINT_CELL)) {
             payPlayer(player, priceService.getSalary());
         } else if (location.equals(GOTO_JAIL_CELL)) {
+            log.info("player " + player.getId() + " goes to jail for landing on 'Go to Jail' cell.");
             handleGoToJail(player);
         }
         if (location.equals(incomeTaxIndex)) {
