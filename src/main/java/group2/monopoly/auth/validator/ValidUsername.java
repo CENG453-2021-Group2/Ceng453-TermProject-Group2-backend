@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * This is a custom annotation that we created to validate the username.
+ * Annotation used for validating username strings
  */
 @Documented
 @Constraint(validatedBy = UsernameConstraintValidator.class)

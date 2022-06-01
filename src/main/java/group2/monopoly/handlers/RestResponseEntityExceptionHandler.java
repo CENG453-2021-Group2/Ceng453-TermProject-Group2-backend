@@ -33,24 +33,16 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
 
     /**
-     * A custom exception handler for the MethodArgumentNotValidException.
+     * Handles {@link MethodArgumentNotValidException}.
+     * <br><br>
+     * The response object has a JSON body describing the problematic fields of a request.
      *
      * @param ex      The exception that was thrown
      * @param headers The headers to be written to the response
      * @param status  The HTTP status code to return.
      * @param request The current request.
      * @return A JSON object with the following structure:
-     * ```
-     * {
-     * "message": "One or more fields could not be validated.",
-     * "errors": {
-     * "field1": [
-     * "error1",
-     * "error2"
-     * ],
-     * "field2": [
-     * "error1",
-     * "error
+     *
      */
     @Override
     @ResponseStatus(HttpStatus.BAD_REQUEST)

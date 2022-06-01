@@ -7,7 +7,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.List;
 
 /**
- * This class is used to validate passwords.
+ * Class used to validate passwords.
  */
 public class PasswordConstraintValidator implements ConstraintValidator<ValidPassword, String> {
 
