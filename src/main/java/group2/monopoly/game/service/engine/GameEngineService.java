@@ -65,6 +65,8 @@ public class GameEngineService implements IGameEngine {
         List<Integer> roll = diceService.roll();
         player.setLastDice(roll);
 
+        log.info("player " + player.getId() + " rolled " + roll);
+
         // Handle double dice
         if (roll.get(0).equals(roll.get(1))) {
             player.setSuccessiveDoubles(player.getSuccessiveDoubles() + 1);
@@ -81,6 +83,8 @@ public class GameEngineService implements IGameEngine {
         Integer advance = roll.stream().reduce(0, Integer::sum);
         Integer oldLocation = player.getLocation();
         player.setLocation((oldLocation + advance) % TABLE_SIZE);
+
+        log.info("player " + player.getId() + " moved: " + oldLocation + " -->" + player.getLocation());
 
         Stream<Integer> ownedPurchasables = getPurchases(players);
         Set<Integer> playerOwnedPurchasables = player.getOwnedPurchasables();
@@ -193,7 +197,7 @@ public class GameEngineService implements IGameEngine {
                 }
             }
         }
-        log.info("port with index " + player.getLocation() + " is owned by the player");
+        log.info("port with index " + player.getLocation() + " is owned by the player themself");
     }
 
     private void handlePropertyCell(Player player,
@@ -214,7 +218,7 @@ public class GameEngineService implements IGameEngine {
                 }
             }
         } else {
-            log.info("property with index " + player.getLocation() + " is owned by the player");
+            log.info("property with index " + player.getLocation() + " is owned by the player themself");
         }
     }
 
