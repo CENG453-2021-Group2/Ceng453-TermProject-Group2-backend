@@ -4,6 +4,14 @@ import lombok.*;
 
 import java.util.ArrayList;
 
+/**
+ * A utility class supplied by {@link ICellSequenceGenerator} for configuring game tables.
+ *
+ * @see ICellSequenceGenerator
+ * @see GameManagerService
+ * @see group2.monopoly.game.entity.Game
+ * @see group2.monopoly.game.entity.GameTableConfiguration
+ */
 @Getter
 @Setter
 @AllArgsConstructor
