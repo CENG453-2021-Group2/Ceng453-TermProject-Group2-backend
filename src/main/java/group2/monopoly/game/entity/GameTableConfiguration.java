@@ -10,6 +10,9 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link Entity} class that describes the static configuration of a game table.
+ */
 @Getter
 @Setter
 @ToString

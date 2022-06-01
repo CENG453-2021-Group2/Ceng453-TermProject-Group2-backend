@@ -11,6 +11,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * {@link Entity} class that represents the state of an ongoing or completed game in an instant.
+ */
 @Getter
 @Setter
 @ToString

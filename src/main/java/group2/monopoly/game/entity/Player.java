@@ -8,6 +8,15 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import java.util.*;
 
+/**
+ * {@link Entity} class that represents the players of a game.
+ * <br><br>
+ * Each {@link Game} object can be associated with many {@link Player}s. Likewise, each
+ * {@link User} object can be associated with many {@link Player}s. However, each {@link Player}
+ * can be associated with one and only one {@link Game} and {@link User} object.
+ * <br>
+ * In that sense, this class can be thought of a user's game-specific state for a particular game.
+ */
 @Getter
 @Setter
 @ToString
