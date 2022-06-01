@@ -41,7 +41,7 @@ public class GameEngineService implements IGameEngine {
                              GameRepository gameRepository,
                              GameCellPriceService priceService,
                              @Qualifier("fileDiceGenerator")
-                                 IDiceGenerator diceService,
+                             IDiceGenerator diceService,
                              GameScoreService scoreService) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
@@ -69,7 +69,8 @@ public class GameEngineService implements IGameEngine {
         if (roll.get(0).equals(roll.get(1))) {
             player.setSuccessiveDoubles(player.getSuccessiveDoubles() + 1);
             if (player.getSuccessiveDoubles().equals(3)) {
-                log.info("player " + player.getId() + " goes to jail for rolling three consecutive doubles.");
+                log.info("player " + player.getId() + " goes to jail for rolling three " +
+                         "consecutive doubles.");
                 handleGoToJail(player);
                 return;
             }
@@ -78,7 +79,8 @@ public class GameEngineService implements IGameEngine {
         }
 
         Integer advance = roll.stream().reduce(0, Integer::sum);
-        player.setLocation((player.getLocation() + advance) % TABLE_SIZE);
+        Integer oldLocation = player.getLocation();
+        player.setLocation((oldLocation + advance) % TABLE_SIZE);
 
         Stream<Integer> ownedPurchasables = getPurchases(players);
         Set<Integer> playerOwnedPurchasables = player.getOwnedPurchasables();
@@ -89,10 +91,13 @@ public class GameEngineService implements IGameEngine {
 
         Integer location = player.getLocation();
 
-        if (location.equals(STARTING_POINT_CELL)) {
+        if (oldLocation > player.getLocation()) {
+            // only happens if the player went past the starting point
+            log.info("player " + player.getId() + " went past the starting point");
             payPlayer(player, priceService.getSalary());
         } else if (location.equals(GOTO_JAIL_CELL)) {
-            log.info("player " + player.getId() + " goes to jail for landing on 'Go to Jail' cell.");
+            log.info("player " + player.getId() + " goes to jail for landing on 'Go to Jail' cell" +
+                     ".");
             handleGoToJail(player);
         }
         if (location.equals(incomeTaxIndex)) {
@@ -112,11 +117,13 @@ public class GameEngineService implements IGameEngine {
             GameFaultyMoveException {
         Game game = player.getGame();
 
-        if (canBuy(player, game, player.getLocation())) {
-            player.getOwnedPurchasables().add(player.getLocation());
+        Integer location = player.getLocation();
+        if (canBuy(player, game, location)) {
+            player.getOwnedPurchasables().add(location);
+            log.info("player " + player.getId() + " buys " + location);
             chargePlayer(player, game,
                     priceService.getCellPrice(game.getGameTableConfiguration(),
-                            player.getLocation()));
+                            location));
         } else {
             throw new GameFaultyMoveException("can not buy cell");
         }
@@ -143,13 +150,17 @@ public class GameEngineService implements IGameEngine {
     }
 
     private void payPlayer(Player player, Integer amount) {
-        player.setMoney(player.getMoney() + amount);
+        Integer oldMoney = player.getMoney();
+        player.setMoney(oldMoney + amount);
+        log.info("paid player " + player.getId() + " " + amount + " " + oldMoney + " -> " + player.getMoney());
         playerRepository.save(player);
     }
 
     private void chargePlayer(Player player, Game game, Integer cost) throws GameOverException {
-        player.setMoney(player.getMoney() - cost);
+        Integer oldMoney = player.getMoney();
+        player.setMoney(oldMoney - cost);
         playerRepository.save(player);
+        log.info("charged player " + player.getId() + " " + cost + " " + oldMoney + " -> " + player.getMoney());
         defaultCheck(player, game);
     }
 
@@ -173,10 +184,10 @@ public class GameEngineService implements IGameEngine {
                     Integer portRent = priceService.getPortRent(game.getGameTableConfiguration(),
                             player.getLocation()
                             , count);
+                    log.info("player " + player.getId() + " landed on player " + p.getId() + "'s " +
+                             "port");
                     chargePlayer(player, game, portRent);
-                    log.info("charged player " + player.getId() + " " + portRent);
                     payPlayer(p, portRent);
-                    log.info("paid player " + p.getId() + " " + portRent);
                     playerRepository.save(p);
                     break;
                 }
@@ -193,12 +204,13 @@ public class GameEngineService implements IGameEngine {
             // Property owned by someone else
             Integer propertyRent = priceService.getPropertyRent(game.getGameTableConfiguration(),
                     location);
-            chargePlayer(player, game, propertyRent);
-            log.info("charged player " + player.getId() + " " + propertyRent);
             for (Player p : game.getPlayers()) {
                 if (p.getOwnedPurchasables().contains(location)) {
+                    log.info("player " + player.getId() + " landed on player " + p.getId() + "'s " +
+                             "property");
+                    chargePlayer(player, game, propertyRent);
                     payPlayer(p, propertyRent);
-                    log.info("paid player " + p.getId() + " " + propertyRent);
+                    break;
                 }
             }
         } else {
@@ -207,6 +219,7 @@ public class GameEngineService implements IGameEngine {
     }
 
     private void handleIncomeTaxCell(Player player, Game game) throws GameOverException {
+        log.info("player " + player.getId() + " landed on property tax cell");
         chargePlayer(player, game, priceService.getIncomeTax());
     }
 
@@ -230,6 +243,7 @@ public class GameEngineService implements IGameEngine {
 
     @Override
     public void nukeGame(Player player, Game game) throws GameOverException {
+        log.info("quite something happening to player " + player.getId());
         chargePlayer(player, game, 10000);
     }
 }
