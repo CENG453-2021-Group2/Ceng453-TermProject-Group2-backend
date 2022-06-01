@@ -1,4 +1,4 @@
-package group2.monopoly.game.service.AiPlayerRunner;
+package group2.monopoly.game.service.ai;
 
 import org.springframework.stereotype.Service;
 

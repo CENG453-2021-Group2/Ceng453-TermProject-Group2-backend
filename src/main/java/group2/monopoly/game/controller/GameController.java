@@ -11,7 +11,7 @@ import group2.monopoly.game.exception.GameManagementException;
 import group2.monopoly.game.exception.GameOverException;
 import group2.monopoly.game.payload.GameCreateDTO;
 import group2.monopoly.game.payload.GameInteractionDTO;
-import group2.monopoly.game.service.AiPlayerRunner.IAiPlayerRunner;
+import group2.monopoly.game.service.ai.IAiPlayerRunner;
 import group2.monopoly.game.service.manager.GameManagerService;
 import group2.monopoly.game.service.engine.IGameCellPrice;
 import group2.monopoly.game.service.engine.IGameEngine;
