@@ -12,6 +12,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * Utility class for generating JWT tokens.
+ */
 @Component
 public class JwtHelper {
 

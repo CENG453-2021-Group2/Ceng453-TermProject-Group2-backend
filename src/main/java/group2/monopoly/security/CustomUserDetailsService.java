@@ -10,24 +10,27 @@ import org.springframework.stereotype.Service;
 
 
 /**
- * It implements the UserDetailsService interface and overrides the loadUserByUsername method
+ * Implements the {@link UserDetailsService} interface.
+ * <br><br>
+ * {@link #loadUserByUsername(String)} method returns a {@link group2.monopoly.auth.entity.User}
+ * object, as the class implements {@link UserDetails} interface.
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    // A constructor.
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     /**
-     * If the user exists, return a UserDetails object with the username, password, and role of the
-     * user. Otherwise, throw an exception.
+     * Returns the {@link group2.monopoly.auth.entity.User} if such user exists with the given
+     * username.
      *
      * @param username The username of the user to load.
-     * @return A UserDetails object.
+     * @return Found user.
+     * @throws UsernameNotFoundException if no matching user exists.
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

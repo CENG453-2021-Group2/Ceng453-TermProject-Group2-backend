@@ -36,7 +36,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * It contains two endpoints, one for login and one for registration
+ * Controller for mapping authentication related endpoints.
  */
 @RestController
 @Slf4j
@@ -45,8 +45,6 @@ public class AuthController {
 
     private final JwtHelper jwtHelper;
     private final UserDetailsService userDetailsService;
-
-    private final AuthenticationManager authenticationManager;
 
     private final UserService userService;
 
@@ -60,21 +58,16 @@ public class AuthController {
                           UserPasswordResetService userPasswordResetService) {
         this.userDetailsService = userDetailsService;
         this.jwtHelper = jwtHelper;
-        this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.userPasswordResetService = userPasswordResetService;
     }
 
     /**
-     * It takes a username and password, checks if they are Validated(CustomGroupSequence.class,
-     * and if they are, it sets the
-     * current
-     * user to the user with that username
+     * Tries to authenticate the supplied credentials.
      *
-     * @param loginDto This is the object that will be sent to the server. It contains the
-     *                 username and
-     *                 password.
-     * @return A generic response with a message of "success"
+     * @param loginDto Validated {@link LoginDto} object
+     * @return Response with JSON body containing the JWT token
+     * @see LoginDto
      */
     @PostMapping("/login")
     public ResponseEntity<JsonNode> authenticateUser(@Validated(CustomGroupSequence.class) @RequestBody LoginDto loginDto) {
@@ -93,12 +86,12 @@ public class AuthController {
     }
 
     /**
-     * If the username or email already exists, return an error message, otherwise create a new
-     * player
-     * and save it to the database
+     * Registers a new user.
+     * <br><br>
+     * The DTO fields are validated with the validators specified in {@link SignUpDto}.
      *
-     * @param signUpDto DTO object with sign up info.
-     * @return A response entity with either the created user or error description.
+     * @param signUpDto validated {@link SignUpDto} object
+     * @return A response entity with either the created user or error description
      */
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@Validated(CustomGroupSequence.class) @RequestBody SignUpDto signUpDto) throws BasicAuthException {
@@ -114,12 +107,12 @@ public class AuthController {
 
     /**
      * Given a username or email, sends a password reset token to the account owner's email.
-     * <p>
+     * <br><br>
      * This endpoint responds the same regardless of whether the requested account exists. This
      * is done to prevent account enumeration by abusing this endpoint.
      *
-     * @param identifier Username or email of the user.
-     * @return JSON response notifying a password reset token is sent if such user exists.
+     * @param identifier Username or email of the user
+     * @return JSON response notifying a password reset token is sent if such user exists
      */
     @PostMapping("/forgotPassword")
     public ResponseEntity<ObjectNode> forgotPassword(@RequestBody @NonNull JsonNode identifier) throws BasicAuthException {
@@ -146,14 +139,14 @@ public class AuthController {
 
     /**
      * Resets the password of the account associated with the provided password reset token.
-     * <p>
+     * <br><br>
      * For the password change to be successful provided new passwords should match and meet the
      * password requirements.
      *
-     * @param passwordResetRequestDTO Contains new password, new password repeated, and the
-     *                                password reset token.
+     * @param passwordResetRequestDTO a {@link PasswordResetRequestDTO} object
      * @return JSON response notifying that the password reset is successful or describing the
-     * errors.
+     * errors
+     * @see PasswordResetRequestDTO
      */
     @PostMapping("/resetPassword")
     public ResponseEntity<JsonNode> resetPassword(@Validated(CustomGroupSequence.class) @RequestBody PasswordResetRequestDTO passwordResetRequestDTO) throws BasicAuthException {
@@ -183,24 +176,21 @@ public class AuthController {
 
     /**
      * Updates the account settings of the currently logged-in user.
-     * <p>
+     * <br><br>
      * Password, username, and email can be changed. For any of these (old) password should be
      * supplied as well. Changing username or email invalidates existing password reset tokens.
      *
      * @param dto user account settings to be updated
      * @return JSON representation of the user
+     * @throws BasicAuthException if the update fails
+     * @see UserSettingsChangeDTO
      */
     @PostMapping("user")
     public ResponseEntity<Object> postUserSettings(@Validated(CustomGroupSequence.class) @RequestBody UserSettingsChangeDTO dto, Authentication authentication) throws BasicAuthException {
-        JwtAuthenticationToken token = (JwtAuthenticationToken) authentication;
-        Map<String, Object> attributes = token.getTokenAttributes();
-
-        UserDetails userDetails =
-                userDetailsService.loadUserByUsername(attributes.get("username").toString());
-        if (!userService.passwordMatches(userDetails, dto.getPassword())) {
+        User user = userService.promoteToUser((JwtAuthenticationToken) authentication);
+        if (!userService.passwordMatches(user, dto.getPassword())) {
             throw new BadCredentialsException("invalid password");
         }
-        User user = userService.promoteToUser(userDetails);
 
         // Password validation
         String newPassword = dto.getNewPassword();

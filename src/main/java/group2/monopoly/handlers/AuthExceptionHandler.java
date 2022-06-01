@@ -7,7 +7,6 @@ import group2.monopoly.mapper.ObjectMapperSingleton;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,9 +14,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 
 /**
- * Handles {@link BadCredentialsException} and {@link BasicAuthException} exceptions.
+ * Handles {@link AuthenticationException}, and {@link BasicAuthException} exceptions.
  * <br>
- * The response body consists of a JSON object with a "message" attribute and "errors" array.
+ * The response body consists of a JSON object with a "message" attribute.
  */
 @ControllerAdvice
 @Slf4j
@@ -36,11 +35,10 @@ public class AuthExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({BasicAuthException.class})
-    public ResponseEntity<JsonNode> handleBasicAuthException(BasicAuthException exception,
+    public ResponseEntity<JsonNode> handleBasicAuthException(Exception exception,
                                                              WebRequest webRequest) {
         JsonNode response = mapper.createObjectNode().put("message", exception.getMessage());
         log.debug("handling exception with response " + response.toString());
         return ResponseEntity.badRequest().body(response);
     }
-
 }

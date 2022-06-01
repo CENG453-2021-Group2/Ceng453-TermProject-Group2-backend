@@ -5,7 +5,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 /**
- * DTO that holds the username and password for a login request
+ * DTO that holds the username and password for a login request.
  */
 @Data
 public class LoginDto {

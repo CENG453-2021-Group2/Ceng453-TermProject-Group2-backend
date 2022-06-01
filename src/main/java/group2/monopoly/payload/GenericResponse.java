@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 /**
- * It's a simple class that can be used to return a success or error message to the client
+ * Class that can be used to return a success or error message to the client
  */
 @Data
 public class GenericResponse {

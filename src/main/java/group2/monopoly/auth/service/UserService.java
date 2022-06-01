@@ -4,54 +4,85 @@ import group2.monopoly.auth.entity.User;
 import group2.monopoly.auth.payload.SignUpDto;
 import group2.monopoly.auth.payload.UserSettingsChangeDTO;
 import group2.monopoly.auth.repository.UserRepository;
+import group2.monopoly.security.CustomUserDetailsService;
 import io.vavr.control.Either;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.vavr.control.Either.left;
 
 /**
- * Service class for user authenticated related tasks.
+ * Service class for user authentication related tasks.
  */
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CustomUserDetailsService userDetailsService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       CustomUserDetailsService userDetailsService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userDetailsService = userDetailsService;
     }
 
     /**
      * Checks supplied raw password.
-     * @param userDetails User the password is being checked against.
-     * @param password Raw password
-     * @return true if raw password matches the user's encoded password after encoding.
+     *
+     * @param userDetails User the password is being checked against
+     * @param password    Raw password
+     * @return true if raw password matches the user's encoded password after encoding
      */
     public boolean passwordMatches(UserDetails userDetails, String password) {
         return passwordEncoder.matches(password, userDetails.getPassword());
     }
 
     /**
+     * Checks supplied raw password.
+     *
+     * @param user     user object
+     * @param password raw password
+     * @return true if the user's password field is the encoded form of the raw password.
+     * @see #passwordMatches(UserDetails, String)
+     */
+    public boolean passwordMatches(User user, String password) {
+        return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    /**
      * Promotes {@link UserDetails} object to a {@link User}.
+     *
      * @param userDetails user details object
      * @return user object with matching username
      */
     public User promoteToUser(UserDetails userDetails) {
         return userRepository.findUserByUsername(userDetails.getUsername());
+    }
+
+    /**
+     * Promotes {@link JwtAuthenticationToken} object to a {@link User}.
+     *
+     * @param authentication jwt authentication object
+     * @return currently authenticated user
+     * @see #promoteToUser(UserDetails)
+     */
+    public User promoteToUser(JwtAuthenticationToken authentication) {
+        Map<String, Object> attributes = authentication.getTokenAttributes();
+
+        UserDetails userDetails =
+                userDetailsService.loadUserByUsername(attributes.get("username").toString());
+        return promoteToUser(userDetails);
     }
 
     /**
@@ -112,7 +143,7 @@ public class UserService {
 
     /**
      * Creates a superuser from given arguments. The User role is hardcoded to "ADMIN" and "USER".
-     * <br>
+     * <br><br>
      * This method is not meant to be used by an endpoint.
      *
      * @param username username
@@ -126,8 +157,20 @@ public class UserService {
                 Stream.of("USER", "ADMIN").collect(Collectors.toSet()));
     }
 
-//    public Either<String, User> update
 
+    /**
+     * Given a user and user settings dto, updates the user settings.
+     * <br><br>
+     * Non-null fields of {@code dto} are attempted to be applied to {@code user}'s fields. For
+     * username and email fields to change, they should not conflict with the existing user's
+     * usernames an emails.
+     *
+     * @param user {@link User} object that will be updated
+     * @param dto  {@link UserSettingsChangeDTO} object for updating user settings
+     * @return Either the updated user or the reason for failure to do so
+     * @see #updateUsername(User, String)
+     * @see #updateEmail(User, String)
+     */
     public Either<String, User> updateUser(@NonNull User user, UserSettingsChangeDTO dto) {
         Either<String, User> eitherUser = Either.right(user);
         eitherUser = eitherUser
@@ -145,7 +188,9 @@ public class UserService {
                         Optional.ofNullable(dto.getNewPassword())
                                 .map(password -> {
                                     if (dto.getPassword().equals(dto.getNewPassword())) {
-                                        return Either.<String, User>left("new password is the same as the previous one");
+                                        return Either.<String, User>left("new password is the " +
+                                                                         "same as the previous " +
+                                                                         "one");
                                     }
                                     u.setPassword(password);
                                     return Either.<String, User>right(u);
@@ -156,6 +201,13 @@ public class UserService {
         return eitherUser;
     }
 
+    /**
+     * Updates the user's email if the given email does not belong to an existing user.
+     *
+     * @param user  {@link User} object whose email will be updated
+     * @param email New email address
+     * @return Either the updated {@link User} object, or the reason for failing to do so
+     */
     private Either<String, User> updateEmail(User user, String email) {
         Optional<User> existingUser = userRepository.findByEmail(email);
         return existingUser.filter(u -> !u.equals(user))
@@ -171,6 +223,13 @@ public class UserService {
     }
 
 
+    /**
+     * Updates the user's username if the given username does not belong to an existing user.
+     *
+     * @param user     {@link User} object whose email will be updated
+     * @param username New username
+     * @return Either the updated {@link User} object, or the reason for failing to do so
+     */
     private Either<String, User> updateUsername(User user, String username) {
         Optional<User> existingUser = userRepository.findByUsername(username);
         return existingUser.filter(u -> !u.equals(user))

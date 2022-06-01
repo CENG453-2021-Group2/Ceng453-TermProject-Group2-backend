@@ -8,15 +8,26 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 
+/**
+ * Implementation of {@link EmailService}.
+ * <br><br>
+ */
 @Service
 @Slf4j
 public class EmailServiceImpl implements EmailService {
     private static final String NO_REPLY_ADDRESS = "no-reply@koluacik.xyz";
 
     @Autowired
-    private JavaMailSender mailSender; // = new JavaMailSenderImpl();
+    private JavaMailSender mailSender;
 
 
+    /**
+     * Sends a plaintext email.
+     *
+     * @param to      receiver of the email
+     * @param subject subject of the email
+     * @param text    body of the email
+     */
     @Override
     public void sendSimpleMessage(String to, String subject, String text) {
         try {

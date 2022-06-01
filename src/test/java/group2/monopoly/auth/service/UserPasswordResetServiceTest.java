@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -70,6 +71,7 @@ class UserPasswordResetServiceTest {
     @Test
     public void Should_CreateNewToken_When_UsernameExists() {
         when(userRepository.findByUsername("user")).thenReturn(Optional.of(users.get(0)));
+        Mockito.doNothing().when(emailService).sendSimpleMessage(any(), any(), any());
         Optional<UserPasswordReset> token = resetService.generateNewToken("user");
         assertTrue(token.isPresent());
     }

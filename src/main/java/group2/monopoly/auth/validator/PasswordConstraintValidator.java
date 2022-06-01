@@ -7,7 +7,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.List;
 
 /**
- * This class is used to validate passwords.
+ * Class used to validate passwords.
  */
 public class PasswordConstraintValidator implements ConstraintValidator<ValidPassword, String> {
 
@@ -21,9 +21,9 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
      * the password is not null, validate it using the password validator and return true if it's
      * valid, otherwise return false and add the error messages to the constraint validator context
      *
-     * @param passwordString             The password string to validate.
-     * @param constraintValidatorContext This is the context of the constraint.
-     * @return A boolean value.
+     * @param passwordString             The password string to validate
+     * @param constraintValidatorContext This is the context of the constraint
+     * @return A boolean value
      */
     @Override
     public boolean isValid(String passwordString,
