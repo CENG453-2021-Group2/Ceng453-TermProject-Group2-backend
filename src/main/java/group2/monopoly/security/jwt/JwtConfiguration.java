@@ -15,6 +15,12 @@ import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
+/**
+ * Configuration class for configuring JWT authentication.
+ * <br><br>
+ * Fields are initialized from the properties file, which retrieves the values from the
+ * environment variables.
+ */
 @Configuration
 @PropertySource("classpath:application.properties")
 public class JwtConfiguration {
