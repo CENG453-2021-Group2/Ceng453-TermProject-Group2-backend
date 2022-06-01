@@ -213,7 +213,8 @@ public class GameEngineService implements IGameEngine {
     }
 
     public boolean canBuy(Player player, Game game, Integer location) {
-        if (Set.of(STARTING_POINT_CELL, GOTO_JAIL_CELL, JAIL_CELL).contains(location)) {
+        Integer incomeTaxIndex = game.getGameTableConfiguration().getIncomeTaxIndex();
+        if (Set.of(STARTING_POINT_CELL, GOTO_JAIL_CELL, JAIL_CELL, incomeTaxIndex).contains(location)) {
             return false;
         } else if (getPurchases(game.getPlayers()).toList().contains(location)) {
             return false;
