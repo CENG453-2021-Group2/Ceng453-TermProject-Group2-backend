@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for validating password reset requests
+ * Annotation for validating password reset requests.
  */
 @Constraint(validatedBy = PasswordResetRequestDTOValidator.class)
 @Target(ElementType.TYPE)

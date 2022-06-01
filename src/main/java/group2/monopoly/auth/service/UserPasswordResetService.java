@@ -113,7 +113,7 @@ public class UserPasswordResetService {
      *
      * @param token       UUID token
      * @param newPassword new password
-     * @return User object if the supplied token was valid.
+     * @return User object if the supplied token was valid
      */
     public Optional<User> resetPassword(@NonNull UUID token, String newPassword) {
         Optional<UserPasswordReset> passwordReset =

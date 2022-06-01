@@ -27,6 +27,7 @@ public class UserPasswordReset implements Serializable {
 
     /**
      * Actual token.
+     * <br><br>
      * See <a href="https://stackoverflow.com/a/48463015">https://stackoverflow.com/a/48463015</a> for rationale behind length=16.
      */
     @Id

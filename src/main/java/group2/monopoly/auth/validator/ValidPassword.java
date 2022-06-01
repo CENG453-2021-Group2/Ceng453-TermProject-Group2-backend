@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.*;
 
 /**
- * Annotation used for validating a raw password string
+ * Annotation used for validating a raw password string.
  */
 @Documented
 @Constraint(validatedBy = PasswordConstraintValidator.class)

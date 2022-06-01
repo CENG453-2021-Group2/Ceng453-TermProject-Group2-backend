@@ -4,8 +4,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /*
- * This class is used to validate the username.
- * It checks if the username is valid.
+ * Class used to validate the username.
  */
 public class UsernameConstraintValidator implements ConstraintValidator<ValidUsername, String> {
 
@@ -14,7 +13,7 @@ public class UsernameConstraintValidator implements ConstraintValidator<ValidUse
     }
 
     /**
-     * This method checks if the username is valid.
+     * Checks if the username is valid.
      *
      * @param username the username to be validated
      * @param constraintValidatorContext  the context of the validation

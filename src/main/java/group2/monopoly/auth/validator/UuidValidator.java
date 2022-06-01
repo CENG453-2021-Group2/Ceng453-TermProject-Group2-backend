@@ -19,7 +19,7 @@ public class UuidValidator implements ConstraintValidator<ValidUuid, String> {
      *
      * @param value   object to validate
      * @param context context in which the constraint is evaluated
-     * @return the result of the validation.
+     * @return the result of the validation
      */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {

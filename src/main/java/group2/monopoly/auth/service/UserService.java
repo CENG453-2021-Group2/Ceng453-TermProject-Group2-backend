@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 import static io.vavr.control.Either.left;
 
 /**
- * Service class for user authenticated related tasks.
+ * Service class for user authentication related tasks.
  */
 @Service
 public class UserService {
@@ -40,9 +40,9 @@ public class UserService {
     /**
      * Checks supplied raw password.
      *
-     * @param userDetails User the password is being checked against.
+     * @param userDetails User the password is being checked against
      * @param password    Raw password
-     * @return true if raw password matches the user's encoded password after encoding.
+     * @return true if raw password matches the user's encoded password after encoding
      */
     public boolean passwordMatches(UserDetails userDetails, String password) {
         return passwordEncoder.matches(password, userDetails.getPassword());
@@ -165,9 +165,9 @@ public class UserService {
      * username and email fields to change, they should not conflict with the existing user's
      * usernames an emails.
      *
-     * @param user {@link User} object that will be updated.
-     * @param dto  {@link UserSettingsChangeDTO} object for updating user settings.
-     * @return Either the updated user or the reason for failure to do so.
+     * @param user {@link User} object that will be updated
+     * @param dto  {@link UserSettingsChangeDTO} object for updating user settings
+     * @return Either the updated user or the reason for failure to do so
      * @see #updateUsername(User, String)
      * @see #updateEmail(User, String)
      */
@@ -206,7 +206,7 @@ public class UserService {
      *
      * @param user  {@link User} object whose email will be updated
      * @param email New email address
-     * @return Either the updated {@link User} object, or the reason for failing to do so.
+     * @return Either the updated {@link User} object, or the reason for failing to do so
      */
     private Either<String, User> updateEmail(User user, String email) {
         Optional<User> existingUser = userRepository.findByEmail(email);
@@ -228,7 +228,7 @@ public class UserService {
      *
      * @param user     {@link User} object whose email will be updated
      * @param username New username
-     * @return Either the updated {@link User} object, or the reason for failing to do so.
+     * @return Either the updated {@link User} object, or the reason for failing to do so
      */
     private Either<String, User> updateUsername(User user, String username) {
         Optional<User> existingUser = userRepository.findByUsername(username);

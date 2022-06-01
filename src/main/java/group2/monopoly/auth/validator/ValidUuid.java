@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used for validation of UUID strings
+ * Annotation used for validation of UUID strings.
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
