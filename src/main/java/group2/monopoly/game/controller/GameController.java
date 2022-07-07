@@ -96,7 +96,20 @@ public class GameController {
     @GetMapping("/{id}")
     public Game getGame(@PathVariable("id") Long id, Authentication authentication) throws GameManagementException {
         User user = userService.promoteToUser((JwtAuthenticationToken) authentication);
-        return gameManager.getGame(user, id);
+        Game game = gameManager.getGame(user, id);
+        List<Player> players = game.getPlayers();
+
+        Player player;
+        Player robot;
+
+        if (players.get(0).getUser() == null) {
+            player = players.get(1);
+            robot = players.get(0);
+        } else {
+            player = players.get(0);
+            robot = players.get(1);
+        }
+        return game;
     }
 
     /**
