@@ -4,9 +4,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * Service for generating pseudo-random dice rolls.
+ */
 @Service(value = "randomDiceGenerator")
 public class RandomDiceGeneratorService implements IDiceGenerator {
 
+    /**
+     * Rolls two numbers between 1 and 6.
+     *
+     * @return random dices
+     */
     @Override
     public List<Integer> roll() {
         Random random = new Random();

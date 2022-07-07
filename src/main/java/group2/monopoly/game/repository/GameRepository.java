@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * JPA repository for {@link Game} entities.
+ */
 @Repository
 public interface GameRepository extends JpaRepository<Game, Long> {
 

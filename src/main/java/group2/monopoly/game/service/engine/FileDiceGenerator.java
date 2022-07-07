@@ -11,6 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Reads sequence of dice rolls from a specified file.
+ * <br>
+ * The path of the file should be specified in 'monopoly.dicefile' property.
+ * The dice file should consist of lines with two integers between 1 and 6 in each, separated by
+ * a blank space. The generator goes back to the first line after reading the last line.
+ *
+ * @see FileDiceGenerator
+ */
 @Slf4j
 @Service(value = "fileDiceGenerator")
 public class FileDiceGenerator implements IDiceGenerator {
@@ -19,6 +28,11 @@ public class FileDiceGenerator implements IDiceGenerator {
 
     private int index;
 
+    /**
+     * Reads a dice file to generate the dice throw list the generator will iterate over.
+     *
+     * @param filePath the path of the dice file
+     */
     public FileDiceGenerator(@Value("${monopoly.dicefile}") String filePath) {
         try (Stream<String> lines = Files.lines(Path.of(filePath))) {
             diceSequence = lines
@@ -28,7 +42,7 @@ public class FileDiceGenerator implements IDiceGenerator {
                     .toList();
             if (diceSequence.isEmpty()) {
                 log.warn("Dice file contains no valid sequence lines, defaulting to 1 - 1.");
-                diceSequence = List.of(List.of(1,1));
+                diceSequence = List.of(List.of(1, 1));
             }
             index = 0;
         } catch (IOException e) {
@@ -41,6 +55,11 @@ public class FileDiceGenerator implements IDiceGenerator {
         }
     }
 
+    /**
+     * Returns the numbers specified in the line after the previous line.
+     *
+     * @return rolled numbers
+     */
     @Override
     public List<Integer> roll() {
         List<Integer> dice = new ArrayList<>();

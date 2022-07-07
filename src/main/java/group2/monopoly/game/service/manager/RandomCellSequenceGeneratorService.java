@@ -4,9 +4,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
+/**
+ * Implements {@link ICellSequenceGenerator} by creating randomly generated cell sequences.
+ */
 @Service
 public class RandomCellSequenceGeneratorService implements ICellSequenceGenerator {
 
+    /**
+     * Generates a {@link CellSequence} randomly.
+     *
+     * @return the randomly generated cell sequence
+     */
     @Override
     public CellSequence generateCellSequence() {
         CellSequence cellSequence = new CellSequence();

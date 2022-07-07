@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/**
+ * Implements {@link IGameCellPrice} interface.
+ */
 @Service
 @Slf4j
 public class GameEngineService implements IGameEngine {
@@ -50,6 +53,12 @@ public class GameEngineService implements IGameEngine {
         this.scoreService = scoreService;
     }
 
+    /**
+     * Executes the movement phase of the player's turn.
+     *
+     * @param player the player who is in the movement phase of their turn
+     * @throws GameOverException if the player goes bankrupt
+     */
     public void moveStep(Player player) throws GameOverException {
         if (player.getRemainingJailTime() > 0) {
             log.info("player " + player.getId() + " in jail with remaining time " + player.getRemainingJailTime());
@@ -64,6 +73,8 @@ public class GameEngineService implements IGameEngine {
 
         List<Integer> roll = diceService.roll();
         player.setLastDice(roll);
+
+        log.info("player " + player.getId() + " rolled " + roll);
 
         // Handle double dice
         if (roll.get(0).equals(roll.get(1))) {
@@ -81,6 +92,8 @@ public class GameEngineService implements IGameEngine {
         Integer advance = roll.stream().reduce(0, Integer::sum);
         Integer oldLocation = player.getLocation();
         player.setLocation((oldLocation + advance) % TABLE_SIZE);
+
+        log.info("player " + player.getId() + " moved: " + oldLocation + " -->" + player.getLocation());
 
         Stream<Integer> ownedPurchasables = getPurchases(players);
         Set<Integer> playerOwnedPurchasables = player.getOwnedPurchasables();
@@ -113,7 +126,13 @@ public class GameEngineService implements IGameEngine {
         playerRepository.save(player);
     }
 
-    public void purchaseStep(Player player) throws GameOverException,
+    /**
+     * Executes the purchase phase of the player's turn.
+     *
+     * @param player the player who is in the purchase step of their turn
+     * @throws GameFaultyMoveException if the cell can't be purchased by the player
+     */
+    public void purchaseStep(Player player) throws
             GameFaultyMoveException {
         Game game = player.getGame();
 
@@ -121,14 +140,29 @@ public class GameEngineService implements IGameEngine {
         if (canBuy(player, game, location)) {
             player.getOwnedPurchasables().add(location);
             log.info("player " + player.getId() + " buys " + location);
-            chargePlayer(player, game,
-                    priceService.getCellPrice(game.getGameTableConfiguration(),
-                            location));
+            try {
+                chargePlayer(player, game,
+                        priceService.getCellPrice(game.getGameTableConfiguration(),
+                                location));
+            } catch (GameOverException e) {
+                log.error("The player should not go bankrupt by trying to purchase a cell!");
+                e.printStackTrace();
+            }
         } else {
             throw new GameFaultyMoveException("can not buy cell");
         }
     }
 
+    /**
+     * Checks the amount of money the player has.
+     * <br><br>
+     * If the player is in negative balance, the game ends. This method should be called by
+     * methods that decrease the amount of money a player has.
+     *
+     * @param player the player to be checked
+     * @param game   the game
+     * @throws GameOverException if the player is in negative balance.
+     */
     private void defaultCheck(Player player, Game game) throws GameOverException {
         if (player.getMoney() < 0) {
             game.setCompletionDate(new Date());
@@ -145,10 +179,22 @@ public class GameEngineService implements IGameEngine {
         }
     }
 
+    /**
+     * Returns the union of purchases of the given list of players.
+     *
+     * @param players the list of players
+     * @return the flattened list of indices of the purchases of the players
+     */
     private Stream<Integer> getPurchases(List<Player> players) {
         return players.stream().flatMap(p -> p.getOwnedPurchasables().stream());
     }
 
+    /**
+     * Utility method that does the exact opposite of {@link #chargePlayer(Player, Game, Integer)}.
+     *
+     * @param player the player
+     * @param amount the amount to pay to the player
+     */
     private void payPlayer(Player player, Integer amount) {
         Integer oldMoney = player.getMoney();
         player.setMoney(oldMoney + amount);
@@ -156,7 +202,16 @@ public class GameEngineService implements IGameEngine {
         playerRepository.save(player);
     }
 
-    private void chargePlayer(Player player, Game game, Integer cost) throws GameOverException {
+    /**
+     * Decreases the player's money amount.
+     *
+     * @param player the player to be charged
+     * @param game   the game
+     * @param cost   the amount of money to be charged
+     * @throws GameOverException if the player goes bankrupt
+     */
+    @Override
+    public void chargePlayer(Player player, Game game, Integer cost) throws GameOverException {
         Integer oldMoney = player.getMoney();
         player.setMoney(oldMoney - cost);
         playerRepository.save(player);
@@ -164,10 +219,19 @@ public class GameEngineService implements IGameEngine {
         defaultCheck(player, game);
     }
 
-    private void handlePortCell(Player player,
-                                Game game,
-                                List<Integer> portIndices,
-                                Set<Integer> playerOwnedPurchasables) throws GameOverException {
+    /**
+     * Charges the player with the port rent if it does not belong to the player.
+     *
+     * @param player                  the player that landed on a purchased port
+     * @param game                    the game
+     * @param playerOwnedPurchasables the player's owned purchasables
+     * @throws GameOverException if the player goes bankrupt
+     */
+    @Override
+    public void handlePortCell(Player player,
+                               Game game,
+                               List<Integer> portIndices,
+                               Set<Integer> playerOwnedPurchasables) throws GameOverException {
         Integer location = player.getLocation();
         List<Player> players = game.getPlayers();
         if (!playerOwnedPurchasables.contains(location)) {
@@ -193,12 +257,21 @@ public class GameEngineService implements IGameEngine {
                 }
             }
         }
-        log.info("port with index " + player.getLocation() + " is owned by the player");
+        log.info("port with index " + player.getLocation() + " is owned by the player themself");
     }
 
-    private void handlePropertyCell(Player player,
-                                    Game game,
-                                    Set<Integer> playerOwnedPurchasables) throws GameOverException {
+    /**
+     * Charges the player with the property rent if it does not belong to the player.
+     *
+     * @param player                  the player that landed on a purchased property
+     * @param game                    the game
+     * @param playerOwnedPurchasables the player's owned purchasables
+     * @throws GameOverException if the player goes bankrupt
+     */
+    @Override
+    public void handlePropertyCell(Player player,
+                                   Game game,
+                                   Set<Integer> playerOwnedPurchasables) throws GameOverException {
         Integer location = player.getLocation();
         if (!playerOwnedPurchasables.contains(location)) {
             // Property owned by someone else
@@ -214,22 +287,45 @@ public class GameEngineService implements IGameEngine {
                 }
             }
         } else {
-            log.info("property with index " + player.getLocation() + " is owned by the player");
+            log.info("property with index " + player.getLocation() + " is owned by the player " +
+                     "themself");
         }
     }
 
-    private void handleIncomeTaxCell(Player player, Game game) throws GameOverException {
+    /**
+     * Charges user for landing on the income tax cell
+     *
+     * @param player the player landed on income tax cell
+     * @param game   the game
+     * @throws GameOverException if the player goes bankrupt
+     */
+    @Override
+    public void handleIncomeTaxCell(Player player, Game game) throws GameOverException {
         log.info("player " + player.getId() + " landed on property tax cell");
         chargePlayer(player, game, priceService.getIncomeTax());
     }
 
-    private void handleGoToJail(Player player) {
+    /**
+     * Sends to player to jail.
+     *
+     * @param player the player
+     */
+    @Override
+    public void handleGoToJail(Player player) {
         player.setLocation(JAIL_CELL);
         player.setRemainingJailTime(JAIL_DURATION);
         player.setSuccessiveDoubles(0);
         playerRepository.save(player);
     }
 
+    /**
+     * Checks whether the given player of the given game can purchase the given location.
+     *
+     * @param player   the player
+     * @param game     the ongoing game
+     * @param location the index of the cell the player wants to buy
+     * @return true if the player can buy the current cell
+     */
     public boolean canBuy(Player player, Game game, Integer location) {
         Integer incomeTaxIndex = game.getGameTableConfiguration().getIncomeTaxIndex();
         if (Set.of(STARTING_POINT_CELL, GOTO_JAIL_CELL, JAIL_CELL, incomeTaxIndex).contains(location)) {
@@ -241,6 +337,13 @@ public class GameEngineService implements IGameEngine {
                 location);
     }
 
+    /**
+     * Afflicts the player with crippling debt ($10000).
+     *
+     * @param player the victim of the crippling debt.
+     * @param game   the game
+     * @throws GameOverException if the player goes bankrupt (they certainly will)
+     */
     @Override
     public void nukeGame(Player player, Game game) throws GameOverException {
         log.info("quite something happening to player " + player.getId());

@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Service class for computing the score of a player.
+ */
 @Service
 public class GameScoreService {
 
@@ -15,7 +18,17 @@ public class GameScoreService {
         this.gameCellPriceService = gameCellPriceService;
     }
 
-    public Integer computeScore(GameTableConfiguration table, List<Integer> properties, Integer money) {
+    /**
+     * Given a game table, and a player's amount of money and list of indices of their owned
+     * properties, computes the player's score.
+     *
+     * @param table      the game table
+     * @param properties the properties belonging to a player
+     * @param money      the amount of money a player has
+     * @return total score of the player
+     */
+    public Integer computeScore(GameTableConfiguration table, List<Integer> properties,
+                                Integer money) {
         Integer propertyScore = properties
                 .stream()
                 .filter(table.getPropertyIndices()::contains) // one of the 8 properties

@@ -12,6 +12,9 @@ import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * JPA repository for {@link Player} entities.
+ */
 @Repository
 public interface PlayerRepository extends JpaRepository<Player, Long> {
     @Query("select p from player p where p.game = ?1 order by p.turnOrder")
